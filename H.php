@@ -5,6 +5,7 @@
   * @author Oyedele Hammed (devHammed)
   * @license http://opensource.org/licenses/mit-license.php  MIT License
   * @version 1.0
+  * @see http://www.oyedelehammed.ml/H.php
   */
 
 /**
