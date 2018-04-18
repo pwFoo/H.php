@@ -74,7 +74,7 @@ Example:
     echo $text; # not secured!
   });
 
-  route('GET', '/books', 'BooksConroller#index');
+  route('GET', '/books', 'BooksController#index');
 ```
 
 <a id="views"></a>
@@ -145,3 +145,57 @@ if ( count( $posts ) ) {
 
 <a id="env"></a>
 ### Environment
+H.php comes with bunch of functions that allows you to interact with Environment variables, below are the functions explanations:
+
+```php
+  req_get( $key, $def='' );
+```
+> The function will return the value for $key in $_GET array else it will return $def.
+
+```php
+  req_post( $key, $def='' );
+```
+> The function will return the value for $key in $_POST array else it will return $def.
+
+```php
+  req_put( $key, $def='' );
+```
+> The function will return the value for $key in PUT request array else it will return $def.
+
+```php
+  req_patch( $key, $def='' );
+```
+> The function will return the value for $key in PATCH request array else it will return $def.
+
+```php
+  req_raw( $key='', $def='' );
+```
+
+> The function will return the value for $key in raw request body else return $def, if none is defined then the function returns unparsed request body.
+
+```php
+  req_cookie( $key, $def='' );
+```
+> The function will return the value for $key in $_COOKIE array else it will return $def.
+
+```php
+  req_session( $key, $def='' );
+```
+> The function will return the value for $key in $_SESSION array else it will return $def.
+
+```php
+  req_file( $key, $def='' );
+```
+> The function will return the value for $key in $_FILES array else it will return $def.
+
+```php
+  req_method( $compare );
+```
+
+> The function returns the Request Method and if $compare is passed it will compare it and returns true/false. NOTE: To emulate PUT/PATCH/DELETE in HTML forms, use a form with `method="POST"` and you will add a hidden input with name `_method` and the method as the value.
+
+```php
+  req_env( $variable );
+```
+
+> This function returns the environment variable in $_SERVER array.
