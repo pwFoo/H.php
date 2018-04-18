@@ -145,7 +145,6 @@ function redirect_to( $url ) {
 
 function req_back() {
  header("Location: {$_SERVER['HTTP_REFERER']}");
- exit;
 }
 
 
