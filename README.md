@@ -199,3 +199,12 @@ H.php comes with bunch of functions that allows you to interact with Environment
 ```
 
 > This function returns the environment variable in $_SERVER array.
+
+```php
+  req_base( $str='' );
+  
+  # URL: localhost/my_app/about
+  # returns `/my_app`
+```
+
+> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/static/css/styles.css' )` returns `/my_app/static/css/styles.css`.
