@@ -207,4 +207,19 @@ H.php comes with bunch of functions that allows you to interact with Environment
   # returns `/my_app`
 ```
 
-> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/static/css/styles.css' )` returns `/my_app/static/css/styles.css`.
+> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/static/css/styles.css' )` it will returns `/my_app/static/css/styles.css` if the base directory is `/my_app`.
+
+```php
+  add_header( $header, $code=null );
+```
+
+> The function can be used to add header, $header is the header string e.g `Content-Type: text/html` and $code is the status code for the response.
+
+```php
+  redirect_to( $url );
+```
+
+> The function can be used to redirect to $url, it can be used with `req_base()` to redirect using relative url.
+
+<a id="cookie"></a>
+### Cookie
