@@ -79,7 +79,7 @@ Example:
 
 <a id="views"></a>
 ### Views
-H.php Views is basically a Native PHP template system using the [Alternative syntax](http://php.net/manual/en/control-structures.alternative-syntax.php) of PHP. `send_view()` function is responsible for the rendering of Views. `esc( $str )` is a function that returns the HTML-escaped string of the argument passed to it, You can also use `send_json( $data )` to send JSON response to the client and you can also use `send_jsonp( $data )` to send JSONP response.
+H.php Views is basically a Native PHP template system using the [Alternative syntax](http://php.net/manual/en/control-structures.alternative-syntax.php) of PHP. `send_view()` function is responsible for the rendering of Views. `esc( $string )` is a function that returns the HTML-escaped string of the argument passed to it, You can also use `send_json( $data )` to send JSON response to the client and you can also use `send_jsonp( $data )` to send JSONP response. below is the explanation for `send_view()` function:-
 
 ```php
   send_view( $name, $data );
@@ -301,3 +301,32 @@ H.php comes with bunch of Session utilities:-
 ```
 
 > Destroys the current Session.
+
+<a id="flash"></a>
+### Flash Messages
+
+Flash Messages are temporary Session values that gets deleted after the next called of `get_flash( $key )`. Let's first explain the functions then an Example will follow:-
+
+```php
+  set_flash( $key, $value );
+```
+
+> This function can be used to set a Flash message.
+
+```php
+  get_flash( $key );
+```
+
+> This function returns the Flash message value if it exists then delete it.
+
+```php
+   has_flash( $key );
+```
+
+> This function can be used to check if a Flash message has been set.
+
+```php
+  keep_flash( $key );
+```
+
+> This function is the opposite of `get_flash`, it returns a Flash message value if it exists but it does not delete it so it can be used in the next View.
