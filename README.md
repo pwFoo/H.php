@@ -223,3 +223,34 @@ H.php comes with bunch of functions that allows you to interact with Environment
 
 <a id="cookie"></a>
 ### Cookie
+H.php also comes with Cookie utilities:-
+
+```php
+  cookie_set( $key, $value='', $expires=null, $path='/', $domain=null, $secure=null, $httponly=null );
+```
+
+> This function is used to set Cookie, it just a wrapper around PHP `setcookie()` function so no complicated explanation is required. NOTE: As per standard, you must set Cookie before sending output to the browser.
+
+```php
+  cookie_get( $key, $def='' );
+```
+
+> This function can be used to get Cookie if it is defined else it will return `$def`.
+
+```php
+  cookie_has( $key );
+```
+
+> This function can be used to check if a Cookie has been set.
+
+```php
+  cookie_delete( $key, $path='/', $domain=null, $httponly=null );
+```
+
+> This function is used to delete a Cookie if it has been set. NOTE: you should add $path, $domain and $httponly if you added them when setting the Cookie else you should only pass `$key`.
+
+```php
+  cookie_reset();
+```
+
+> This function can be used to clear all Cookies.
