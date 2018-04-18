@@ -221,6 +221,12 @@ H.php comes with bunch of functions that allows you to interact with Environment
 
 > The function can be used to redirect to $url, it can be used with `req_base()` to redirect using relative url.
 
+```php
+  req_back();
+```
+
+> This function can be used to redirect back to the previous page e.g after form submission.
+
 <a id="cookie"></a>
 ### Cookie
 H.php also comes with Cookie utilities:-
@@ -330,3 +336,33 @@ Flash Messages are temporary Session values that gets deleted after the next cal
 ```
 
 > This function is the opposite of `get_flash`, it returns a Flash message value if it exists but it does not delete it so it can be used in the next View.
+
+Example:-
+
+```php
+ # index.php
+ 
+ # config and settings here
+ 
+ route( 'POST', '/comment', function() {
+   # insert something into database
+   set_flash( 'message', 'Blah blah blah' ); # set a message
+   req_back(); # go back
+ }
+ 
+ # demoView.php
+ 
+ if ( has_flash( 'message' ) ) {
+   echo get_flash( 'message' );
+ }
+ 
+ # ...
+```
+
+<hr>
+
+Thanks you, this framework is open-source and you are free to send pull requests.
+
+Creator:- [Oyedele Hammed Horlah](https://devhammed.github.io)
+
+> Released under MIT License.
