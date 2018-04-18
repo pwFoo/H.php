@@ -254,3 +254,50 @@ H.php also comes with Cookie utilities:-
 ```
 
 > This function can be used to clear all Cookies.
+
+<a id="session"></a>
+### Session
+
+H.php comes with bunch of Session utilities:-
+
+```php
+  ses_start();
+```
+
+> Starts a session
+
+```php
+  ses_set( $key, $value );
+```
+
+> Set a Session value
+
+```php
+  ses_get( $key, $def='' );
+```
+
+> Returns Session value is it exist else returns $def.
+
+```php
+  ses_has( $key );
+```
+
+> Check if a Session value has been set.
+
+```php
+  ses_delete( $key );
+```
+
+> Deletes Session value if it has been set.
+
+```php
+  ses_id( $new='' );
+```
+
+> Get the current Session ID or Set it if `$new` is passed.
+
+```php
+  ses_reset();
+```
+
+> Destroys the current Session.
