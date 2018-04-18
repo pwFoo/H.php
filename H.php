@@ -143,6 +143,11 @@ function redirect_to( $url ) {
   header( 'Location: ' . $url );
 }
 
+function req_back() {
+ header("Location: {$_SERVER['HTTP_REFERER']}");
+ exit;
+}
+
 
 // Cookie functions
 
