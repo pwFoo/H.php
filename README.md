@@ -79,7 +79,7 @@ Example:
 
 <a id="views"></a>
 ### Views
-H.php Views is basically a Native PHP template system using the [Alternative syntax](http://php.net/manual/en/control-structures.alternative-syntax.php) of PHP. `send_view()` function is responsible for the rendering of Views. `esc( $str )` is a function that returns the HTML-escaped string of the argument passed to it, You can also use `send_json( $data )` to send JSON response to the client.
+H.php Views is basically a Native PHP template system using the [Alternative syntax](http://php.net/manual/en/control-structures.alternative-syntax.php) of PHP. `send_view()` function is responsible for the rendering of Views. `esc( $str )` is a function that returns the HTML-escaped string of the argument passed to it, You can also use `send_json( $data )` to send JSON response to the client and you can also use `send_jsonp( $data )` to send JSONP response.
 
 ```php
   send_view( $name, $data );
