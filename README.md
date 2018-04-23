@@ -410,7 +410,7 @@ Example:-
 
 <hr>
 
-Thanks you, this framework is open-source and you are free to send pull requests.
+Thanks, this framework is open-source and you are free to send pull requests.
 
 Creator:- [Oyedele Hammed Horlah](https://devhammed.github.io)
 
