@@ -1,6 +1,13 @@
 <?php
+/**
+ * H.php | The Minimalist PHP Framework!
+ * @author Oyedele Hammed (devHammed)
+ * @see http://github.com/devHammed/H.php
+ * @version 1.0
+ * @license MIT License
+ */
 
-// Route function
+# Route
 
 function route( $type, $regex, $fn ) {
   $type = explode( '|', $type );
@@ -26,7 +33,7 @@ function route( $type, $regex, $fn ) {
 }
 
 
-// View functions
+# View
 
 function send_view( $file='', $vars='' ) {
   $file = VIEWS_DIR . $file . '.php';
@@ -40,19 +47,20 @@ function send_view( $file='', $vars='' ) {
 }
 
 function send_json( $data ) {
+  req_type( 'application/json;charset=utf8' );
   return json_encode( $data );
 }
 
 function send_jsonp( $data ) {
-  header( 'Content-type: text/javascript' );
-  echo $_GET['callback'] . '(' . json_encode( $data ) .')';
+  req_type( 'text/javascript' );
+  echo $_GET['callback'] . '(' . json_encode( $data ) .');';
 }
 
-function esc( $var, $def='' ) {
-  return ( !empty( $var ) ) ? htmlspecialchars( $var ) : htmlspecialchars( $def );
+function esc( $var ) {
+  return htmlspecialchars( $var );
 }
 
-// Database functions
+# Database
 
 function db_run( $sql, $bind=array() ) {
   $options = array(
@@ -83,8 +91,7 @@ function db_select( $sql, $bind=array() ) {
   return $rows;
 }
 
-// Request functions
-
+# Environment
 
 function req_get( $key, $def='' ) {
   return isset( $_GET[$key] ) ? $_GET[$key] : $def;
@@ -127,7 +134,7 @@ function req_method( $key='' ) {
   return ( !empty( $key ) ) ? ( $method === $key ) : $method;
 }
 
-function req_env( $key ) {
+function req_env( $key='' ) {
   return getenv( $key );
 }
 
@@ -140,15 +147,23 @@ function add_header( $str, $code=null ) {
 }
 
 function redirect_to( $url ) {
-  header( 'Location: ' . $url );
+  add_header( 'Location: ' . $url );
+}
+
+function req_status( $code=null ) {
+  return http_response_code( $code );
 }
 
 function req_back() {
- header("Location: {$_SERVER['HTTP_REFERER']}");
+  redirect_to( req_env('HTTP_REFERER') );
+}
+
+function req_type( $type ) {
+  add_header( 'Content-type: ' . $type );
 }
 
 
-// Cookie functions
+# Cookie
 
 function cookie_set( $key, $val='', $exp=null, $path='/',$domain=null, $secure=null, $httponly=null ) {
   setcookie( $key, $val, time() + $exp, $path, $domain, $secure, $httponly );
@@ -173,7 +188,7 @@ function cookie_reset() {
 
 
 
-// Session functions
+# Session
 
 function ses_start() {
   session_start();
@@ -204,7 +219,7 @@ function ses_reset() {
   session_destroy();
 }
 
-// Flash functions
+# Flash
 
 function set_flash( $key, $val ) {
   if ( !ses_id() )

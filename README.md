@@ -18,11 +18,11 @@
 
 <a id="intro"></a>
 ### Introduction
-> H.php is a Minimal and Lighweight PHP Function-based framework that is designed for you to prototype and create Web Applications and APIs quickly without going through those unnecessary setups and installations.
+> H.php is a Minimal and Lighweight PHP Function-based framework that is designed for you to quickly prototype and build Web Applications and APIs.
 
 <a id="install"></a>
 ### Installation
-H.php does'nt require any special installation process, you will just have to copy `.htaccess` file to your app root and `H.php` file in your project then you will require it and begin your journey of `Minimalism`! e.g if `H.php` is in the `lib` folder :-
+H.php does'nt require long installation process, you will just have to copy `.htaccess` file to your app root and `H.php` file in your project then you will require it and begin your journey of `Minimalism`! e.g if `H.php` is in the `lib` folder :-
 ```php
   require 'lib/H.php';
 ```
@@ -67,26 +67,64 @@ Example:
   define('CONTROLLERS_DIR', 'contollers/');
 
   route('ANY', '/', function(){
-    echo 'Hello World';
+    return 'Hello World'; # you can also use `echo`
   });
 
   route('GET | POST', '/echo/(\w+)', function( $text ){
-    echo $text; # not secured!
+    echo $text; # a view should be used instead!
   });
 
   route('GET', '/books', 'BooksController#index');
+
+  # controllers/BooksController.php
+
+  class BooksController {
+    public function index() {
+      # do some magic here!
+    }
+  }
 ```
 
 <a id="views"></a>
 ### Views
-H.php Views is basically a Native PHP template system using the [Alternative syntax](http://php.net/manual/en/control-structures.alternative-syntax.php) of PHP. `send_view()` function is responsible for the rendering of Views. `esc( $string )` is a function that returns the HTML-escaped string of the argument passed to it, You can also use `send_json( $data )` to send JSON response to the client and you can also use `send_jsonp( $data )` to send JSONP response. below is the explanation for `send_view()` function:-
+H.php comes with a simple View system that is easy to use and it also make use of PHP alternative structure so you don't need to learn a new template syntax. Below is a rundown of the functions available :-
 
 ```php
+  # $name ( string ): The name of the template to include from the path defined in constant `VIEWS_DIR`. you also dont need to append `.php` extension.
+
+  # $data ( associative array ): The data that get passed to the View.
+
   send_view( $name, $data );
 ```
-> $name ( string ): The name of the template to include from the path defined in constant `VIEWS_DIR`. you also dont need to append `.php` extension.
+> This function can be used to render PHP-HTML template to the browser.
 
-> $data ( associative array ): The data that get passed to the View.
+```php
+  esc( $var );
+```
+> This function can be used to HTML-escape a variable to output.
+
+```php
+  send_json( $data );
+```
+> This function can be used to send JSON data.
+
+```php
+  send_jsonp( $data );
+```
+> This function can be used to send JSONP script, `NOTE:` the request URL should include `callback` query param with the value of JavaScript function to call e.g `http://www.mysite.tld/api/jsonp/?callback=myFunc`.
+
+Below are the guidelines on how to use native PHP for template:-
+- Always use HTML with inline PHP. Never use blocks of PHP.
+- Always use `esc( $var )` function to escape potentially dangerous variables.
+- Always use the short echo syntax (`<?=`) when outputting variables. For other inline PHP code, use the full `<?php` tag.
+- Always use the [PHP alternative syntax for control structures](http://php.net/manual/en/control-structures.alternative-syntax.php), which are designed to make templates more legible.
+- Never use PHP curly brackets.
+- Only put one statement in each PHP tag.
+- Avoid using semicolons. They are not needed when there is only one statement per PHP tag.
+- Never use the `for`, `while` or `switch` control structures. Instead use `if` and `foreach`.
+- Avoid variable assignment.
+
+`Culled from: ` PHP Plates template engine syntax guidelines.
 
 Example:
 ```php
@@ -95,14 +133,14 @@ Example:
   define('VIEWS_DIR', 'views/');
 
   route('GET', '/user/(\w+)', function( $user ){
-    echo send_view( 'userView', array(
+    return send_view( 'userView', array(
       'name' => $user,
     ));
   });
 
   # views/userView.php
 
-  <?= esc( $name ); ?>
+  <?= esc( $name ) ?>
 ```
 
 <a id="database"></a>
@@ -127,25 +165,26 @@ Example:
 
 route('GET', '/posts', function(){
   $posts = db_select('SELECT * FROM posts');
-  echo send_view('postsView', array( 'posts' => $posts ) );
+  return send_view('postsView', array( 'posts' => $posts ) );
 });
 
 # views/postsView.php
 
-if ( count( $posts ) ) {
-  foreach ( $posts as $post ) {
-  # do something with $post e.g $post['title']
-  }
-} else {
-  echo 'No posts';
-}
+  <?php if ( count( $posts ) ): ?>
+    <?php foreach ( $posts as $post ): ?>
+      <h1><?= $post['title'] ?></h1>
+      <p><?= $post['body'] ?></p>
+    <?php endforeach ?>
+  <?php else: ?>
+    <p>No posts in this blog!</p>
+  <?php endif ?>
 
 ```
 
 
 <a id="env"></a>
 ### Environment
-H.php comes with bunch of functions that allows you to interact with Environment variables, below are the functions explanations:
+H.php comes with bunch of functions that allows you to interact with Environment variables, Request variables and Response, below are the functions explanations:
 
 ```php
   req_get( $key, $def='' );
@@ -202,12 +241,12 @@ H.php comes with bunch of functions that allows you to interact with Environment
 
 ```php
   req_base( $str='' );
-  
+
   # URL: localhost/my_app/about
   # returns `/my_app`
 ```
 
-> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/static/css/styles.css' )` it will returns `/my_app/static/css/styles.css` if the base directory is `/my_app`.
+> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`.
 
 ```php
   add_header( $header, $code=null );
@@ -226,6 +265,16 @@ H.php comes with bunch of functions that allows you to interact with Environment
 ```
 
 > This function can be used to redirect back to the previous page e.g after form submission.
+
+```php
+  req_status( $code=null );
+```
+> Set HTTP status code if $code is passed else return the current status code.
+
+```php
+  req_type( $content_type );
+```
+> Set the response Content type e.g `application/json`.
 
 <a id="cookie"></a>
 ### Cookie
@@ -341,21 +390,21 @@ Example:-
 
 ```php
  # index.php
- 
+
  # config and settings here
- 
+
  route( 'POST', '/comment', function() {
    # insert something into database
    set_flash( 'message', 'Blah blah blah' ); # set a message
    req_back(); # go back
  }
- 
+
  # demoView.php
- 
- if ( has_flash( 'message' ) ) {
-   echo get_flash( 'message' );
- }
- 
+
+ <?php if ( has_flash( 'message' ) ): ?>
+   <p id="message--text"><?= get_flash( 'message' ) ?></p>
+ <?php endif ?>
+
  # ...
 ```
 
