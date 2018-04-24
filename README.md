@@ -13,6 +13,7 @@
 * [Cookies](#cookie)
 * [Session](#session)
 * [Flash Messages](#flash)
+* [Resources](#resources)
 
 
 
@@ -44,7 +45,7 @@ H.php will need some constants you are using some feature like Views, Controller
 
 * DB_PASS : Databse Password
 
-> TIP: You can define the constants in `config.php` file then include it inyour `index.php`.
+> TIP: You can define the constants e.g Site title etc. in `config.php` file then include it iny our `index.php`.
 
 <a id="routes"></a>
 ### Routes
@@ -408,9 +409,17 @@ Example:-
  # ...
 ```
 
+<a id="resources"></a>
+### Resources
+
+Below are links to some resources and examples to get you started.
+
+* [H.php Boilerplate Project](https://github.com/devHammed/H.php-Boilerplate)
+* [Simple Chat Project](https://github.com/devHammed/H.php-Chat)
+
 <hr>
 
-Thanks, this framework is open-source and you are free to send pull requests.
+Thanks you, this framework is open-source and you are free to send pull requests.
 
 Creator:- [Oyedele Hammed Horlah](https://devhammed.github.io)
 
