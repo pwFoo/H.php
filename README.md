@@ -1,5 +1,7 @@
 # H.php
 
+![Logo](H.png)
+
 > The Minimalist PHP Framework!
 
 ## Table of Contents
