@@ -54,7 +54,7 @@ H.php utilize Regular Expression for it routing function `route()`. Below is the
 ```php
   route( $method, $regex_path, $callable_handler );
 ```
-> $method ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to match multiple methods e.g `GET | POST`. NOTE: it is case-insensitve for happiness so, `GET` is same as `get` or `Get` or `gEt`. :-)
+> $method ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to match multiple methods e.g `GET | POST`. NOTE: it is case-insensitve for your happiness so, `GET` is same as `get` or `Get` or `gEt`. :smile:
 
 > $regex_path ( string  | regex ): The pattern to match, NOTE: you don't need to write full regex, just the string e.g `/` or to match dynmaic routes `/user/(\w+)/` and optional parameters can be suffixed with `?` e.g `/user/(\w+)?/`. All the captures in this regexp will be passed in order to the `$handler` callable function and remember to use default argument for optional parameters e.g `function( $user=NULL ){ ... }`.
 
