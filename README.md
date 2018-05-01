@@ -1,7 +1,5 @@
 # H.php
 
-![Logo](H.png)
-
 > The Minimalist PHP Framework!
 
 ## Table of Contents
@@ -56,9 +54,9 @@ H.php utilize Regular Expression for it routing function `route()`. Below is the
 ```php
   route( $method, $regex_path, $callable_handler );
 ```
-> $method ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to match multiple methods e.g `GET | POST`
+> $method ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to match multiple methods e.g `GET | POST`. NOTE: it is case-insensitve for happiness so, `GET` is same as `get` or `Get` or `gEt`. :-)
 
-> $regex_path ( string  | regex ): The pattern to match, NOTE: you don't need to write full regex, just the string e.g `/` or to match dynmaic routes `/user/(\w+)/` and also you dont need to worry about URL trailing slash. all the captures in this regexp will be passed in order to the `$handler` callable function.
+> $regex_path ( string  | regex ): The pattern to match, NOTE: you don't need to write full regex, just the string e.g `/` or to match dynmaic routes `/user/(\w+)/` and optional parameters can be suffixed with `?` e.g `/user/(\w+)?/`. All the captures in this regexp will be passed in order to the `$handler` callable function and remember to use default argument for optional parameters e.g `function( $user=NULL ){ ... }`.
 
 > $callable_handler ( callable ): It can be a anonymous function, variable function or any other valid callablea in PHP, you can read docs for PHP [call_user_func_array()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better. Also you can use a string that separates Class and Method by `#`, your Class will be Auto-loaded from the path specified in `CONTROLLERS_DIR` constant e.g `BookController#addBook`.
 

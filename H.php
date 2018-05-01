@@ -11,10 +11,12 @@
 
 function route( $type, $regex, $fn ) {
   $type = explode( '|', $type );
-  $type = array_map( 'trim', $type );
+  $type = array_map( 'trim', array_map( 'strtoupper', $type ) );
   $path = isset( $_SERVER['PATH_INFO'] ) ? $_SERVER['PATH_INFO'] : '/';
+  $regex = '~^' . $regex . '/?$~';
   $req_valid = ( in_array( 'ANY', $type ) || in_array( req_method(), $type ) );
-  if ( preg_match( '~^' . $regex . '/?$~', $path, $args ) && $req_valid ) {
+
+  if ( preg_match( $regex, $path, $args ) && $req_valid ) {
     if ( is_string( $fn ) && strpos( $fn, '#' ) ) {
       $parts = explode( '#', $fn );
       $ctrl = $parts[0];
