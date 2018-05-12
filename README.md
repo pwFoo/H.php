@@ -13,6 +13,7 @@
 * [Cookies](#cookie)
 * [Session](#session)
 * [Flash Messages](#flash)
+* [Security / Hash](#security)
 * [Resources](#resources)
 
 
@@ -65,17 +66,17 @@ Example:
 ```php
   # index.php
 
-  define('CONTROLLERS_DIR', 'contollers/');
+  define( 'CONTROLLERS_DIR', 'contollers/' );
 
-  route('ANY', '/', function(){
+  route( 'ANY', '/', function(){
     return 'Hello World'; # you can also use `echo`
-  });
+  } );
 
-  route('GET | POST', '/echo/(\w+)', function( $text ){
+  route( 'GET | POST', '/echo/(\w+)', function( $text ){
     echo $text; # a view should be used instead!
-  });
+  } );
 
-  route('GET', '/books', 'BooksController#index');
+  route( 'GET', '/books', 'BooksController#index' );
 
   # controllers/BooksController.php
 
@@ -131,13 +132,13 @@ Example:
 ```php
   # index.php
 
-  define('VIEWS_DIR', 'views/');
+  define( 'VIEWS_DIR', 'views/' );
 
-  route('GET', '/user/(\w+)', function( $user ){
+  route( 'GET', '/user/(\w+)', function( $user ){
     return send_view( 'userView', array(
       'name' => $user,
-    ));
-  });
+    ) );
+  } );
 
   # views/userView.php
 
@@ -164,10 +165,10 @@ Example:
 
 # define constants or require config.php here
 
-route('GET', '/posts', function(){
-  $posts = db_select('SELECT * FROM posts');
-  return send_view('postsView', array( 'posts' => $posts ) );
-});
+route( 'GET', '/posts', function(){
+  $posts = db_select( 'SELECT * FROM posts' );
+  return send_view( 'postsView', array( 'posts' => $posts ) );
+} );
 
 # views/postsView.php
 
@@ -408,6 +409,32 @@ Example:-
 
  # ...
 ```
+
+<a id="security"></a>
+### Security / Hash
+H.php also has functions that can be used to hash passwords or strings, the functions are basically wrappers around PHP `password_hash` and `password_verify` functions.
+
+```php
+  make_hash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL );
+```
+> This function can be used to generate secure hash for `$str`.
+
+>`$algo` is the algoritm to use when generating hash, it can be `PASSWORD_DEFAULT` or `PASSWORD_BCRYPT` or `PASSWORD_ARGON2I`. it defaults to `PASSWORD_DEFAULT` which will use the latest secured algorithm in PHP.
+
+> `$opts` are options to use when generating, Read more at [PHP password_hash](http://php.net/manual/en/function.password-hash.php).
+
+>This function can be used to hash a password before saving to the database.
+
+```php
+  check_hash( $str, $hash );
+```
+> This function can be used to verify a `$hash` against `$str`, returns `TRUE` if it is valid else returns `FALSE`. This is useful for verifying password entered by user againt the hashed version in the database. Read more at [PHP password_verify](http://php.net/manual/en/function.password-verify.php).
+
+```php
+  needs_rehash( $hash, $algo=PASSWORD_DEFAULT, $opts=NULL );
+```
+> This function checks if the given hash matches the given options and algorithm. returns `TRUE` if matched else returns `FALSE`. Read more at [PHP password_needs_rehash](http://php.net/manual/en/function.password-needs-rehash.php).
+
 
 <a id="resources"></a>
 ### Resources
