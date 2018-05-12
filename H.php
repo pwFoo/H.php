@@ -124,7 +124,7 @@ function req_cookie( $key, $def='' ) {
 }
 
 function req_file( $key ) {
-  return isset( $_FILES[$key] ) ? $_FILES[$key] : null;
+  return isset( $_FILES[$key] ) ? $_FILES[$key] : NULL;
 }
 
 function req_session( $key, $def='' ) {
@@ -144,7 +144,7 @@ function req_base( $str='/' ) {
   return dirname( req_env('SCRIPT_NAME') ) . $str;
 }
 
-function add_header( $str, $code=null ) {
+function add_header( $str, $code=NULL ) {
   header( $str , true, $code );
 }
 
@@ -167,7 +167,7 @@ function req_type( $type ) {
 
 # Cookie
 
-function cookie_set( $key, $val='', $exp=null, $path='/',$domain=null, $secure=null, $httponly=null ) {
+function cookie_set( $key, $val='', $exp=NULL, $path='/',$domain=NULL, $secure=NULL, $httponly=NULL ) {
   setcookie( $key, $val, time() + $exp, $path, $domain, $secure, $httponly );
 }
 
@@ -235,7 +235,7 @@ function get_flash( $key ) {
   if ( !ses_id() )
     ses_start();
   if ( !has_flash( $key ) )
-    return null;
+    return NULL;
   $val = $_SESSION['h_flash_msg'][$key];
   unset( $_SESSION['h_flash_msg'][$key] );
   return $val;
@@ -246,4 +246,17 @@ function keep_flash( $key ) {
   if ( !has_flash( $key ) )
     return null;
   return $_SESSION['h_flash_msg'][$key];
+}
+
+# Security
+function make_hash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+  return password_hash( $str, $algo, $opts );
+}
+
+function check_hash( $str, $hash ) {
+  return password_verify( $str, $hash );
+}
+
+function needs_rehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+  return password_needs_rehash( $str, $algo, $opts );
 }
