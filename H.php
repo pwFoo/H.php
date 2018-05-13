@@ -229,6 +229,8 @@ function set_flash( $key, $val ) {
   $_SESSION['h_flash_msg'][$key] = $val;
 }
 function has_flash( $key ) {
+  if ( !ses_id() )
+    ses_start();
   return isset( $_SESSION['h_flash_msg'][$key] );
 }
 function get_flash( $key ) {
