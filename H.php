@@ -262,5 +262,5 @@ function needs_rehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
 }
 
 function random_hash( $length=10 ) {
-  return substr( md5( time() ), 0, $length );
+  return substr( md5( mt_rand() ), 0, $length );
 }
