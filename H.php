@@ -246,7 +246,7 @@ function keep_flash( $key ) {
   if ( !ses_id() )
     ses_start();
   if ( !has_flash( $key ) )
-    return null;
+    return NULL;
   return $_SESSION['h_flash_msg'][$key];
 }
 
