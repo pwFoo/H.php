@@ -435,6 +435,11 @@ H.php also has functions that can be used to hash passwords or strings, the func
 ```
 > This function checks if the given hash matches the given options and algorithm. returns `TRUE` if matched else returns `FALSE`. Read more at [PHP password_needs_rehash](http://php.net/manual/en/function.password-needs-rehash.php).
 
+```php
+  random_hash( $length=10 );
+```
+> This function returns random md5 hash string, it can be used to generate Coupon/Promotional code, Referral code or unique file names. you can specify `$length` of the the hash but it returns 10 characters by default.
+
 
 <a id="resources"></a>
 ### Resources
