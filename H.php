@@ -260,3 +260,7 @@ function check_hash( $str, $hash ) {
 function needs_rehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_needs_rehash( $str, $algo, $opts );
 }
+
+function random_hash( $length=10 ) {
+  return substr( md5( time() ), 0, $length );
+}
