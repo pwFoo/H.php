@@ -14,7 +14,7 @@
 * [Session](#session)
 * [Flash Messages](#flash)
 * [Security / Hash](#security)
-* [Resources](#resources)
+* [Resources / Projects](#resources)
 
 
 
@@ -442,12 +442,13 @@ H.php also has functions that can be used to hash passwords or strings, the func
 
 
 <a id="resources"></a>
-### Resources
+### Resources / Projects
 
 Below are links to some resources and examples to get you started.
 
 * [H.php Boilerplate Project](https://github.com/devHammed/H.php-Boilerplate)
 * [Simple Chat Project](https://github.com/devHammed/H.php-Chat)
+* [Simple Link Shortener](https://github.com/devHammed/H.php-Shorty)
 
 <hr>
 
