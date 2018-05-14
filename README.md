@@ -20,7 +20,7 @@
 
 <a id="intro"></a>
 ### Introduction
-> H.php is a Minimal and Lighweight PHP Function-based framework that is designed for you to quickly prototype and build Web Applications and APIs.
+> H.php is a Minimal and Lighweight PHP Function-based MVC-ish framework that is designed for you to prototype and build Web Applications and APIs without stress.
 
 <a id="install"></a>
 ### Installation
