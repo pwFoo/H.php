@@ -40,11 +40,11 @@ H.php will need some constants you are using some feature like Views, Controller
 
 * DB_HOST : Database Host
 
-* DB_NAME : Databse Name
+* DB_NAME : Database Name
 
-* DB_USER : Databse Username
+* DB_USER : Database Username
 
-* DB_PASS : Databse Password
+* DB_PASS : Database Password
 
 > TIP: You can define the constants e.g Site title etc. in `config.php` file then include it iny our `index.php`.
 
