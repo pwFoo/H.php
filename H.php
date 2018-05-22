@@ -21,7 +21,7 @@ function route( $type, $regex, $fn ) {
       $parts = explode( '#', $fn );
       $ctrl = $parts[0];
       $method = $parts[1];
-      $ctrl_path = CONTROLLERS_DIR . $ctrl . '.php';
+      $ctrl_path = config_get( 'controllers_dir', 'controllers/' ) . $ctrl . '.php';
       if ( !file_exists( $ctrl_path ) )
         die( 'No Controller: ' . $ctrl );
       include $ctrl_path;
@@ -44,9 +44,9 @@ function db_run( $sql, $bind=array() ) {
   );
   $sql = trim( $sql );
   try {
-    $db_host = config_get( 'db_host' );
+    $db_host = config_get( 'db_host', 'localhost' );
     $db_name = config_get( 'db_name' );
-    $db_user = config_get( 'db_user' );
+    $db_user = config_get( 'db_user', 'root' );
     $db_pass = config_get( 'db_pass' );
     $dbh = new PDO( 'mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass, $options );
   } catch ( PDOException $e ) {
@@ -131,10 +131,6 @@ function req_env( $key='' ) {
   return getenv( $key );
 }
 
-function req_type() {
-  return req_header( 'Content-Type' );
-}
-
 function req_base( $str='/' ) {
   return dirname( req_env( 'SCRIPT_NAME' ) ) . $str;
 }
@@ -162,7 +158,7 @@ function res_type( $type ) {
 }
 
 function res_render( $file='', $vars='' ) {
-  $file = config_get( 'views_dir' ) . $file . '.php';
+  $file = config_get( 'views_dir', 'views/' ) . $file . '.php';
   if ( !file_exists( $file ) )
     die( 'View not found: ' . $file );
   if ( is_array( $vars ) )
@@ -285,7 +281,7 @@ function hash_needsRehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_needs_rehash( $str, $algo, $opts );
 }
 
-function hash_random( $length=10 ) {
+function hash_random( $length=32 ) {
   return substr( md5( mt_rand() ), 0, $length );
 }
 

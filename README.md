@@ -7,13 +7,14 @@
 * [Installation](#install)
 * [Configuration](#config)
 * [Routes](#routes)
-* [Views](#views)
+* [Request](#request)
+* [Response](#response)
 * [Database](#database)
 * [Environment](#env)
 * [Cookies](#cookie)
 * [Session](#session)
 * [Flash Messages](#flash)
-* [Security / Hash](#security)
+* [Hash](#hash)
 * [Resources / Projects](#resources)
 
 
@@ -32,21 +33,38 @@ Note: If your Web Server doesn't support rewrite, your app will still work e.g `
 
 <a id="config"></a>
 ### Configuration
-H.php will need some constants you are using some feature like Views, Controllers and Database, below are the list of constants that you are required to `define`:
+H.php comes with Configuration helper functions that can be used to set in-memory configurations.
 
-* CONTROLLERS_DIR : The path to the directory containing Controllers class files. NOTE: with a trailing slash e.g `controllers/`
+```php
+    config_set( $key, $value );
+```
+> This function can be used for setting configurations and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. NOTE: to use features like Database, Autoloading classes and View, you should set below configurations:
+* `controllers_dir`: the directory to load controller classes from. default: controllers/.
+* `views_dir` : the directory to load views from. default: views/.
+* `db_host` : your database host. default: localhost.
+* `db_name` : your database name. default: none.
+* `db_user` : your database username. default: root.
+* `db_pass` : your database password. default: none.
 
-* VIEWS_DIR : The path to the directory containing templates files. NOTE: with a trailing slash e.g `views/`
+```php
+    config_get( $key, $default=NULL );
+```
+> This function can be used to get a configuration value and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. returns `$default` if `$key` have not been set.
 
-* DB_HOST : Database Host
+```php
+    config_has( $key );
+```
+> This function can be used to check if a configuration have been set the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. returns `TRUE` or `FALSE` based on the result of the checking.
 
-* DB_NAME : Database Name
+```php
+    config_delete( $key );
+```
+> This function deletes a configuration value if it have been set only the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`.
 
-* DB_USER : Database Username
-
-* DB_PASS : Database Password
-
-> TIP: You can define the constants e.g Site title etc. in `config.php` file then include it iny our `index.php`.
+```php
+    config_reset();
+```
+> This function resets the configuration array.
 
 <a id="routes"></a>
 ### Routes
@@ -59,26 +77,27 @@ H.php utilize Regular Expression for it routing function `route()`. Below is the
 
 > $regex_path ( string  | regex ): The pattern to match, NOTE: you don't need to write full regex, just the string e.g `/` or to match dynmaic routes `/user/(\w+)/` and optional parameters can be suffixed with `?` e.g `/user/(\w+)?/`. All the captures in this regexp will be passed in order to the `$handler` callable function and remember to use default argument for optional parameters e.g `function( $user=NULL ){ ... }`.
 
-> $callable_handler ( callable ): It can be a anonymous function, variable function or any other valid callablea in PHP, you can read docs for PHP [call_user_func_array()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better. Also you can use a string that separates Class and Method by `#`, your Class will be Auto-loaded from the path specified in `CONTROLLERS_DIR` constant e.g `BookController#addBook`.
+> $callable_handler ( callable ): It can be a anonymous function, variable function or any other valid callablea in PHP, you can read docs for PHP [call_user_func_array()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better. Also you can use a string that separates Class and Method by `#`, your Class will be Auto-loaded from the path specified in `CONTROLLERS_DIR` configuration e.g `BookController#addBook`.
 
 Example:
 
 ```php
   # index.php
 
-  define( 'CONTROLLERS_DIR', 'contollers/' );
+  config_set( 'CONTROLLERS_DIR', 'myContollers/' );
 
   route( 'ANY', '/', function(){
     return 'Hello World'; # you can also use `echo`
   } );
 
   route( 'GET | POST', '/echo/(\w+)', function( $text ){
-    echo $text; # a view should be used instead!
+    config_set( 'page_title', 'Echo World' );
+    return config_get( 'page_title' ) . ' ' . $text; # a view can be used instead!
   } );
 
   route( 'GET', '/books', 'BooksController#index' );
 
-  # controllers/BooksController.php
+  # myControllers/BooksController.php
 
   class BooksController {
     public function index() {
@@ -87,106 +106,9 @@ Example:
   }
 ```
 
-<a id="views"></a>
-### Views
-H.php comes with a simple View system that is easy to use and it also make use of PHP alternative structure so you don't need to learn a new template syntax. Below is a rundown of the functions available :-
-
-```php
-  # $name ( string ): The name of the template to include from the path defined in constant `VIEWS_DIR`. you also dont need to append `.php` extension.
-
-  # $data ( associative array ): The data that get passed to the View.
-
-  send_view( $name, $data );
-```
-> This function can be used to render PHP-HTML template to the browser.
-
-```php
-  esc( $var );
-```
-> This function can be used to HTML-escape a variable to output.
-
-```php
-  send_json( $data );
-```
-> This function can be used to send JSON data.
-
-```php
-  send_jsonp( $data );
-```
-> This function can be used to send JSONP script, `NOTE:` the request URL should include `callback` query param with the value of JavaScript function to call e.g `http://www.mysite.tld/api/jsonp/?callback=myFunc`.
-
-Below are the guidelines on how to use native PHP for template:-
-- Always use HTML with inline PHP. Never use blocks of PHP.
-- Always use `esc( $var )` function to escape potentially dangerous variables.
-- Always use the short echo syntax (`<?=`) when outputting variables. For other inline PHP code, use the full `<?php` tag.
-- Always use the [PHP alternative syntax for control structures](http://php.net/manual/en/control-structures.alternative-syntax.php), which are designed to make templates more legible.
-- Never use PHP curly brackets.
-- Only put one statement in each PHP tag.
-- Avoid using semicolons. They are not needed when there is only one statement per PHP tag.
-- Never use the `for`, `while` or `switch` control structures. Instead use `if` and `foreach`.
-- Avoid variable assignment.
-
-`Culled from: ` PHP Plates template engine syntax guidelines.
-
-Example:
-```php
-  # index.php
-
-  define( 'VIEWS_DIR', 'views/' );
-
-  route( 'GET', '/user/(\w+)', function( $user ){
-    return send_view( 'userView', array(
-      'name' => $user,
-    ) );
-  } );
-
-  # views/userView.php
-
-  <?= esc( $name ) ?>
-```
-
-<a id="database"></a>
-### Database
-H.php comes with two functions that allows you to interact with a database using PDO connection. Both of the two functions supports Parameter placeholders, you can read more on PDO to understand this better.
-
-```php
-  db_run( $sql, $bind=array() ); // => $res
-```
-> `db_run` allows you to run SQL queries on your Database and it PDO response object.
-
-```php
-  db_select( $sql, $bind=array() ); // => array || null
-```
-> `db_select` is designed only to run SQL SELECT query and it returns array containing the results.
-
-Example:
-```php
-# index.php
-
-# define constants or require config.php here
-
-route( 'GET', '/posts', function(){
-  $posts = db_select( 'SELECT * FROM posts' );
-  return send_view( 'postsView', array( 'posts' => $posts ) );
-} );
-
-# views/postsView.php
-
-  <?php if ( count( $posts ) ): ?>
-    <?php foreach ( $posts as $post ): ?>
-      <h1><?= $post['title'] ?></h1>
-      <p><?= $post['body'] ?></p>
-    <?php endforeach ?>
-  <?php else: ?>
-    <p>No posts in this blog!</p>
-  <?php endif ?>
-
-```
-
-
-<a id="env"></a>
-### Environment
-H.php comes with bunch of functions that allows you to interact with Environment variables, Request variables and Response, below are the functions explanations:
+<a id="request"></a>
+### Request
+H.php comes with functions that you can use to interact with Client Request Headers and Variabless.
 
 ```php
   req_get( $key, $def='' );
@@ -242,6 +164,11 @@ H.php comes with bunch of functions that allows you to interact with Environment
 > This function returns the environment variable in $_SERVER array.
 
 ```php
+    req_header( $key );
+```
+> This function can be used to get a Client Request Header e.g `X-Requested-With`, `Content-Type` etc.
+
+```php
   req_base( $str='' );
 
   # URL: localhost/my_app/about
@@ -250,33 +177,130 @@ H.php comes with bunch of functions that allows you to interact with Environment
 
 > The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`.
 
+<a id="response"></a>
+### Response
+H.php comes with functions to send response and views to the client.
+
 ```php
-  add_header( $header, $code=null );
+  res_addHeader( $header, $code=NULL );
 ```
 
 > The function can be used to add header, $header is the header string e.g `Content-Type: text/html` and $code is the status code for the response.
 
 ```php
-  redirect_to( $url );
+  res_redirect( $url );
 ```
 
 > The function can be used to redirect to $url, it can be used with `req_base()` to redirect using relative url.
 
 ```php
-  req_back();
+  res_back();
 ```
 
 > This function can be used to redirect back to the previous page e.g after form submission.
 
 ```php
-  req_status( $code=null );
+  res_status( $code=NULL );
 ```
 > Set HTTP status code if $code is passed else return the current status code.
 
 ```php
-  req_type( $content_type );
+  res_type( $content_type );
 ```
 > Set the response Content type e.g `application/json`.
+
+```php
+  # $name ( string ): The name of the template to include from the path defined in consfiguration `VIEWS_DIR`. you also dont need to append `.php` extension.
+
+  # $data ( associative array ): The data that get passed to the View.
+
+  res_render( $name, $data );
+```
+> This function can be used to render native PHP templates to the browser.
+
+```php
+  esc( $var );
+```
+> This function can be used to HTML-escape a variable to output.
+
+```php
+  res_json( $data );
+```
+> This function can be used to send JSON data.
+
+```php
+  res_jsonp( $data,  $callback='callback' );
+```
+> This function can be used to send JSONP script. NOTE: the request URL should include `$callback` query param with the value of JavaScript function to call e.g `http://www.mysite.tld/api/jsonp/?callback=myFunc`.
+
+Below are the guidelines on how to use native PHP for template:-
+- Always use HTML with inline PHP. Never use blocks of PHP.
+- Always use `esc( $var )` function to escape potentially dangerous variables.
+- Always put `<?php if ( !config_has( 'h_php_init' ) ) die(); ?>` at the top of your view file to prevent direct access to it.
+- Always use the short echo syntax (`<?=`) when outputting variables. For other inline PHP code, use the full `<?php` tag.
+- Always use the [PHP alternative syntax for control structures](http://php.net/manual/en/control-structures.alternative-syntax.php), which are designed to make templates more legible.
+- Never use PHP curly brackets.
+- Only put one statement in each PHP tag.
+- Avoid using semicolons. They are not needed when there is only one statement per PHP tag.
+- Never use the `for`, `while` or `switch` control structures. Instead use `if` and `foreach`.
+- Avoid variable assignment.
+
+Example:
+```php
+  # index.php
+
+  config_set( 'VIEWS_DIR', 'myViews/' );
+
+  route( 'GET', '/user/(\w+)', function( $user ){
+    return res_render( 'userView', array(
+      'name' => $user,
+    ) );
+  } );
+
+  # myViews/userView.php
+  <?php if ( !config_has( 'h_php_init' ) ) die(); ?>
+
+  <?= esc( $name ) ?>
+```
+
+<a id="database"></a>
+### Database
+H.php comes with two functions that allows you to interact with a database using PDO connection. Both of the two functions supports Parameter placeholders, you can read more on PDO to understand this better.
+
+```php
+  db_run( $sql, $bind=array() ); // => $res
+```
+> `db_run` allows you to run SQL queries on your Database and it PDO response object.
+
+```php
+  db_select( $sql, $bind=array() ); // => array || null
+```
+> `db_select` is designed only to run SQL SELECT query and it returns array containing the results.
+
+Example:
+```php
+# index.php
+
+# define configurations here
+
+route( 'GET', '/posts', function(){
+  $posts = db_select( 'SELECT * FROM posts' );
+  return res_render( 'postsView', array( 'posts' => $posts ) );
+} );
+
+# views/postsView.php
+  <?php if ( !config_has( 'h_php_init' ) ) die(); ?>
+
+  <?php if ( count( $posts ) ): ?>
+    <?php foreach ( $posts as $post ): ?>
+      <h1><?= $post['title'] ?></h1>
+      <p><?= $post['body'] ?></p>
+    <?php endforeach ?>
+  <?php else: ?>
+    <p>No posts in this blog!</p>
+  <?php endif ?>
+
+```
 
 <a id="cookie"></a>
 ### Cookie
@@ -362,31 +386,31 @@ H.php comes with bunch of Session utilities:-
 <a id="flash"></a>
 ### Flash Messages
 
-Flash Messages are temporary Session values that gets deleted after the next called of `get_flash( $key )`. Let's first explain the functions then an Example will follow:-
+Flash Messages are temporary Session values that gets deleted after the next called of `flash_get( $key )`. Let's first explain the functions then an Example will follow:-
 
 ```php
-  set_flash( $key, $value );
+  flash_set( $key, $value );
 ```
 
 > This function can be used to set a Flash message.
 
 ```php
-  get_flash( $key );
+  flash_get( $key );
 ```
 
 > This function returns the Flash message value if it exists then delete it.
 
 ```php
-   has_flash( $key );
+   flash_has( $key );
 ```
 
 > This function can be used to check if a Flash message has been set.
 
 ```php
-  keep_flash( $key );
+  flash_keep( $key );
 ```
 
-> This function is the opposite of `get_flash`, it returns a Flash message value if it exists but it does not delete it so it can be used in the next View.
+> This function is the opposite of `flash_get`, it returns a Flash message value if it exists but it does not delete it so it can be used in the next View.
 
 Example:-
 
@@ -397,25 +421,25 @@ Example:-
 
  route( 'POST', '/comment', function() {
    # insert something into database
-   set_flash( 'message', 'Blah blah blah' ); # set a message
+   flash_set( 'message', 'Blah blah blah' ); # set a message
    req_back(); # go back
  }
 
  # demoView.php
 
- <?php if ( has_flash( 'message' ) ): ?>
-   <p id="message--text"><?= get_flash( 'message' ) ?></p>
+ <?php if ( flash_has( 'message' ) ): ?>
+   <p id="message--text"><?= flash_get( 'message' ) ?></p>
  <?php endif ?>
 
  # ...
 ```
 
-<a id="security"></a>
-### Security / Hash
+<a id="hash"></a>
+### Hash
 H.php also has functions that can be used to hash passwords or strings, the functions are basically wrappers around PHP `password_hash` and `password_verify` functions.
 
 ```php
-  make_hash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL );
+  hash_make( $str, $algo=PASSWORD_DEFAULT, $opts=NULL );
 ```
 > This function can be used to generate secure hash for `$str`.
 
@@ -426,19 +450,19 @@ H.php also has functions that can be used to hash passwords or strings, the func
 >This function can be used to hash a password before saving to the database.
 
 ```php
-  check_hash( $str, $hash );
+  hash_check( $str, $hash );
 ```
 > This function can be used to verify a `$hash` against `$str`, returns `TRUE` if it is valid else returns `FALSE`. This is useful for verifying password entered by user againt the hashed version in the database. Read more at [PHP password_verify](http://php.net/manual/en/function.password-verify.php).
 
 ```php
-  needs_rehash( $hash, $algo=PASSWORD_DEFAULT, $opts=NULL );
+  hash_needsRehash( $hash, $algo=PASSWORD_DEFAULT, $opts=NULL );
 ```
 > This function checks if the given hash matches the given options and algorithm. returns `TRUE` if matched else returns `FALSE`. Read more at [PHP password_needs_rehash](http://php.net/manual/en/function.password-needs-rehash.php).
 
 ```php
-  random_hash( $length=10 );
+  hash_random( $length=32 );
 ```
-> This function returns random md5 hash string, it can be used to generate Coupon/Promotional code, Referral code or unique file names. you can specify `$length` of the the hash but it returns 10 characters by default.
+> This function returns random md5 hash string, it can be used to generate Coupon/Promotional code, Referral code or unique file names. you can specify `$length` of the the hash but it returns 32 characters by default.
 
 
 <a id="resources"></a>
@@ -452,7 +476,7 @@ Below are links to some resources and examples to get you started.
 
 <hr>
 
-Thanks you, this framework is open-source and you are free to send pull requests.
+Thanks, did you want to contribute? fork this repo and send pull requests.
 
 Creator:- [Oyedele Hammed Horlah](https://devhammed.github.io)
 
