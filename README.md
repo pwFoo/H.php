@@ -10,7 +10,6 @@
 * [Request](#request)
 * [Response](#response)
 * [Database](#database)
-* [Environment](#env)
 * [Cookies](#cookie)
 * [Session](#session)
 * [Flash Messages](#flash)
@@ -25,7 +24,7 @@
 
 <a id="install"></a>
 ### Installation
-Download zip archive [here](https://github.com/devHammed/H.php/archive/v1.1.0.zip) then extract and you will just have to copy `.htaccess` file to your app root and `H.php` file in your project then you will require it! e.g if `H.php` is in the `lib` folder :-
+Download zip archive [here](https://github.com/devHammed/H.php/archive/v1.2.0.zip) then extract and you will just have to copy `.htaccess` file to your app root and `H.php` file in your project then you will require it! e.g if `H.php` is in the `lib` folder :-
 ```php
   require 'lib/H.php';
 ```
