@@ -135,7 +135,7 @@ function req_base( $str='/' ) {
   return dirname( req_env( 'SCRIPT_NAME' ) ) . $str;
 }
 
-# Response / View
+# Response
 
 function res_addHeader( $str, $code=NULL ) {
   header( $str , true, $code );
