@@ -422,7 +422,7 @@ Example:-
  route( 'POST', '/comment', function() {
    # insert something into database
    flash_set( 'message', 'Blah blah blah' ); # set a message
-   req_back(); # go back
+   res_back(); # go back
  }
 
  # demoView.php
