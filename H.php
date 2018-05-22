@@ -298,7 +298,7 @@ function config_get( $key, $def=NULL ) {
 
 function config_has( $key ) {
   $key = strtolower( $key );
-  return iseet( $GLOBALS[ 'h_php_config' ][ $key ] );
+  return isset( $GLOBALS[ 'h_php_config' ][ $key ] );
 }
 
 function config_delete( $key ) {
