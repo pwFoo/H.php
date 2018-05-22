@@ -30,7 +30,7 @@ function route( $type, $regex, $fn ) {
       $fn = array( new $ctrl, $method );
     }
     array_shift( $args );
-    var_dump( $args );
+    config_set( 'h_php_init', 1 );
     die( call_user_func_array( $fn, array_values( $args ) ) );
   }
 }
@@ -44,7 +44,11 @@ function db_run( $sql, $bind=array() ) {
   );
   $sql = trim( $sql );
   try {
-    $dbh = new PDO( 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS, $options );
+    $db_host = config_get( 'db_host' );
+    $db_name = config_get( 'db_name' );
+    $db_user = config_get( 'db_user' );
+    $db_pass = config_get( 'db_pass' );
+    $dbh = new PDO( 'mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass, $options );
   } catch ( PDOException $e ) {
     die( 'Error connecting to the database!' );
   }
@@ -145,7 +149,7 @@ function res_redirect( $url ) {
   res_addHeader( 'Location: ' . $url );
 }
 
-function res_status( $code=null ) {
+function res_status( $code=NULL ) {
   return http_response_code( $code );
 }
 
@@ -153,12 +157,12 @@ function res_back() {
   res_redirect( req_header( 'Referer' ) );
 }
 
-function res_setType( $type ) {
+function res_type( $type ) {
   res_addHeader( 'Content-type: ' . $type );
 }
 
 function res_render( $file='', $vars='' ) {
-  $file = VIEWS_DIR . $file . '.php';
+  $file = config_get( 'views_dir' ) . $file . '.php';
   if ( !file_exists( $file ) )
     die( 'View not found: ' . $file );
   if ( is_array( $vars ) )
@@ -169,13 +173,13 @@ function res_render( $file='', $vars='' ) {
 }
 
 function res_json( $data ) {
-  res_setType( 'application/json;charset=utf8' );
+  res_type( 'application/json;charset=utf8' );
   return json_encode( $data );
 }
 
 function res_jsonp( $data, $callback='callback' ) {
   if ( !isset( $_GET[ $callback ] ) ) die( 'No JSONP Callback!' );
-  res_setType( 'text/javascript' );
+  res_type( 'text/javascript' );
   echo $_GET[ $callback ] . '(' . json_encode( $data ) .');';
 }
 
@@ -244,20 +248,20 @@ function ses_reset() {
 function flash_set( $key, $val ) {
   if ( !ses_id() )
     ses_start();
-  $_SESSION[ 'h_flash_msg' ][ $key ] = $val;
+  $_SESSION[ 'h_php_flash_msg' ][ $key ] = $val;
 }
 function flash_has( $key ) {
   if ( !ses_id() )
     ses_start();
-  return isset( $_SESSION[ 'h_flash_msg' ][ $key ] );
+  return isset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
 }
 function flash_get( $key ) {
   if ( !ses_id() )
     ses_start();
   if ( !flash_has( $key ) )
     return NULL;
-  $val = $_SESSION[ 'h_flash_msg' ][ $key ];
-  unset( $_SESSION[ 'h_flash_msg' ][ $key ] );
+  $val = $_SESSION[ 'h_php_flash_msg' ][ $key ];
+  unset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
   return $val;
 }
 function flash_keep( $key ) {
@@ -265,10 +269,10 @@ function flash_keep( $key ) {
     ses_start();
   if ( !flash_has( $key ) )
     return NULL;
-  return $_SESSION[ 'h_flash_msg' ][ $key ];
+  return $_SESSION[ 'h_php_flash_msg' ][ $key ];
 }
 
-# Security
+# Hash
 function hash_make( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_hash( $str, $algo, $opts );
 }
@@ -283,4 +287,29 @@ function hash_needsRehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
 
 function hash_random( $length=10 ) {
   return substr( md5( mt_rand() ), 0, $length );
+}
+
+# Configuration
+function config_set( $key, $val ) {
+  $key = strtolower( $key );
+  $GLOBALS[ 'h_php_config' ][ $key ] = $val;
+}
+
+function config_get( $key, $def=NULL ) {
+  $key = strtolower( $key );
+  return config_has( $key ) ? $GLOBALS[ 'h_php_config' ][ $key ] : $def;
+}
+
+function config_has( $key ) {
+  $key = strtolower( $key );
+  return iseet( $GLOBALS[ 'h_php_config' ][ $key ] );
+}
+
+function config_delete( $key ) {
+  $key = strtolower( $key );
+  unset( $GLOBALS[ 'h_php_config' ][ $key ] );
+}
+
+function config_reset() {
+  $GLOBALS[ 'h_php_config' ] = array();
 }
