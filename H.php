@@ -109,7 +109,7 @@ function req_method( $key='' ) {
   return ( !empty( $key ) ) ? ( $method == $key ) : $method;
 }
 
-function req_header( $key=NULL ) {
+function req_header( $key ) {
   foreach ( $_SERVER as $k => $v ) {
     if ( substr( $k, 0, 5 ) == 'HTTP_' ) {
       $k = str_replace( '_', '-', substr( $k, 5 ) );
@@ -169,12 +169,13 @@ function res_render( $file='', $vars='' ) {
 }
 
 function res_json( $data ) {
-  res_type( 'application/json;charset=utf8' );
+  res_setType( 'application/json;charset=utf8' );
   return json_encode( $data );
 }
 
 function res_jsonp( $data, $callback='callback' ) {
-  res_type( 'text/javascript' );
+  if ( !isset( $_GET[ $callback ] ) ) die( 'No JSONP Callback!' );
+  res_setType( 'text/javascript' );
   echo $_GET[ $callback ] . '(' . json_encode( $data ) .');';
 }
 
@@ -230,8 +231,8 @@ function ses_delete( $key ) {
     unset( $_SESSION[$key] );
 }
 
-function ses_id( $new='' ) {
-  return ( !empty( $new ) ) ? session_id( $new ) : session_id();
+function ses_id( $newID='' ) {
+  return ( !empty( $newID ) ) ? session_id( $newID ) : session_id();
 }
 
 function ses_reset() {
@@ -268,18 +269,18 @@ function flash_keep( $key ) {
 }
 
 # Security
-function make_hash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+function hash_make( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_hash( $str, $algo, $opts );
 }
 
-function check_hash( $str, $hash ) {
+function hash_check( $str, $hash ) {
   return password_verify( $str, $hash );
 }
 
-function needs_rehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+function hash_needsRehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_needs_rehash( $str, $algo, $opts );
 }
 
-function random_hash( $length=10 ) {
+function hash_random( $length=10 ) {
   return substr( md5( mt_rand() ), 0, $length );
 }
