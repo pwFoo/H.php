@@ -15,7 +15,6 @@ function route( $type, $regex, $fn ) {
   $path = !empty( $_SERVER[ 'PATH_INFO' ] ) ? $_SERVER[ 'PATH_INFO' ] : '/';
   $regex = '~^' . $regex . '/?$~';
   $req_valid = ( in_array( 'ANY', $type ) || in_array( req_method(), $type ) );
-
   if ( preg_match( $regex, $path, $args ) && $req_valid ) {
     if ( is_string( $fn ) && strpos( $fn, '#' ) ) {
       $parts = explode( '#', $fn );
@@ -30,7 +29,6 @@ function route( $type, $regex, $fn ) {
       $fn = array( new $ctrl, $method );
     }
     array_shift( $args );
-    config_set( 'h_php_init', 1 );
     die( call_user_func_array( $fn, array_values( $args ) ) );
   }
 }
@@ -135,7 +133,7 @@ function req_base( $str='/' ) {
   return dirname( req_env( 'SCRIPT_NAME' ) ) . $str;
 }
 
-# Response
+# Response / View
 
 function res_addHeader( $str, $code=NULL ) {
   header( $str , true, $code );
@@ -309,3 +307,6 @@ function config_delete( $key ) {
 function config_reset() {
   $GLOBALS[ 'h_php_config' ] = array();
 }
+
+# Initialize
+define( 'H_PHP', 1 );

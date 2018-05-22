@@ -235,7 +235,7 @@ H.php comes with functions to send response and views to the client.
 Below are the guidelines on how to use native PHP for template:-
 - Always use HTML with inline PHP. Never use blocks of PHP.
 - Always use `esc( $var )` function to escape potentially dangerous variables.
-- Always add `<?php if ( !config_has( 'h_php_init' ) ) die(); ?>` at the top of your view file to prevent direct access to it.
+- Always add `<?php if ( !defined( 'H_PHP' ) ) die( 'Permission denied!' ) ?>` at the top of your view file to prevent direct access to it.
 - Always use the short echo syntax (`<?=`) when outputting variables. For other inline PHP code, use the full `<?php` tag.
 - Always use the [PHP alternative syntax for control structures](http://php.net/manual/en/control-structures.alternative-syntax.php), which are designed to make templates more legible.
 - Never use PHP curly brackets.
