@@ -3,7 +3,7 @@
  * H.php | The Minimalist PHP Framework!
  * @author Oyedele Hammed (devHammed)
  * @see http://github.com/devHammed/H.php
- * @version 1.0
+ * @version 1.2.0
  * @license MIT License
  */
 
@@ -192,7 +192,7 @@ function cookie_get( $key, $def='' ) {
 }
 
 function cookie_has( $key ) {
-  return isset( $_COOKIE[$key] );
+  return isset( $_COOKIE[ $key ] );
 }
 
 function cookie_delete( $key, $path='/', $domain=null, $httponly=null ) {
@@ -213,7 +213,7 @@ function ses_start() {
 }
 
 function ses_set( $key, $val ) {
-   $_SESSION[$key] = $val;
+   $_SESSION[ $key ] = $val;
 }
 
 function ses_get( $key, $def='' ) {
@@ -221,12 +221,12 @@ function ses_get( $key, $def='' ) {
 }
 
 function ses_has( $key ) {
-  return isset( $_SESSION[$key] );
+  return isset( $_SESSION[ $key ] );
 }
 
 function ses_delete( $key ) {
   if ( ses_has( $key ) )
-    unset( $_SESSION[$key] );
+    unset( $_SESSION[ $key ] );
 }
 
 function ses_id( $newID='' ) {
@@ -308,5 +308,5 @@ function config_reset() {
   $GLOBALS[ 'h_php_config' ] = array();
 }
 
-# Initialize
+# Start H.php
 define( 'H_PHP', 1 );
