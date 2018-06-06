@@ -176,6 +176,15 @@ H.php comes with functions that you can use to interact with Client Request Head
 
 > The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`.
 
+```php
+  req_site( $str='/' );
+
+  # URL: localhost/my_app/about | returns: http(s)://localhost
+  # URL: www.mylivewebsite.tld/about | returns: http(s)://www.mylivewebsite.com
+```
+> This function returns the current domain and protocol, it is useful when you want to get full website URL without hard-coding it. if `$str` is defined, it will be appended to the returned URL, by default `$str` is `\` and it is recommended to use it with `req_base()` to get accurate full URL, especially in localhost.
+
+
 <a id="response"></a>
 ### Response
 H.php comes with functions to send response and views to the client.
