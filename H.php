@@ -3,7 +3,7 @@
  * H.php | The Minimalist PHP Framework!
  * @author Oyedele Hammed (devHammed)
  * @see http://github.com/devHammed/H.php
- * @version 1.0
+ * @version 1.2.1
  * @license MIT License
  */
 
@@ -87,7 +87,7 @@ function req_patch( $key, $def='' ) {
 }
 
 function req_raw( $key='', $def='' ) {
-  $input = file_get_contents('php://input');
+  $input = file_get_contents( 'php://input' );
   if ( empty( $key ) )
     return $input;
   parse_str( $input, $raw );
@@ -107,8 +107,8 @@ function req_session( $key, $def='' ) {
 }
 
 function req_method( $key='' ) {
-  $method = isset( $_REQUEST[ '_method' ] ) ? ucwords( $_REQUEST[ '_method' ] ) : getenv( 'request_method' );
-  return ( !empty( $key ) ) ? ( $method == $key ) : $method;
+  $method = isset( $_REQUEST[ '_method' ] ) ? strtoupper( $_REQUEST[ '_method' ] ) : strtoupper( getenv( 'request_method' ) );
+  return ( !empty( $key ) ) ? ( $method == strtoupper( $key ) ) : $method;
 }
 
 function req_header( $key ) {
@@ -134,14 +134,15 @@ function req_base( $str='/' ) {
 }
 
 function req_site( $str='/' ) {
-    $protocol = ( !empty($_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] !== 'off' || $_SERVER[ 'SERVER_PORT' ] == 443 ) ? "https://" : "http://";
-    $domainName = $_SERVER[ 'HTTP_HOST' ] ;
-    return $protocol . $domainName . $str;
+  $protocol = ( !empty($_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] !== 'off' || $_SERVER[ 'SERVER_PORT' ] == 443 ) ? "https://" : "http://";
+  $domainName = $_SERVER[ 'HTTP_HOST' ] ;
+  return $protocol . $domainName . $str;
 }
 
 # Response / View
 
 function res_addHeader( $str, $code=NULL ) {
+  if ( headers_sent() ) die( 'Headers has been sent!' );
   header( $str , true, $code );
 }
 
@@ -149,7 +150,7 @@ function res_redirect( $url ) {
   res_addHeader( 'Location: ' . $url );
 }
 
-function res_status( $code=NULL ) {
+function res_status( $code ) {
   return http_response_code( $code );
 }
 
@@ -178,7 +179,7 @@ function res_json( $data ) {
 }
 
 function res_jsonp( $data, $callback='callback' ) {
-  if ( !isset( $_GET[ $callback ] ) ) die( 'No JSONP Callback!' );
+  if ( !isset( $_GET[ $callback ] ) ) die( 'No JSONP Callback `' . $callback . '`' );
   res_type( 'text/javascript' );
   echo $_GET[ $callback ] . '(' . json_encode( $data ) .');';
 }
@@ -198,7 +199,7 @@ function cookie_get( $key, $def='' ) {
 }
 
 function cookie_has( $key ) {
-  return isset( $_COOKIE[$key] );
+  return isset( $_COOKIE[ $key ] );
 }
 
 function cookie_delete( $key, $path='/', $domain=null, $httponly=null ) {
@@ -219,7 +220,7 @@ function ses_start() {
 }
 
 function ses_set( $key, $val ) {
-   $_SESSION[$key] = $val;
+   $_SESSION[ $key ] = $val;
 }
 
 function ses_get( $key, $def='' ) {
@@ -227,12 +228,12 @@ function ses_get( $key, $def='' ) {
 }
 
 function ses_has( $key ) {
-  return isset( $_SESSION[$key] );
+  return isset( $_SESSION[ $key ] );
 }
 
 function ses_delete( $key ) {
   if ( ses_has( $key ) )
-    unset( $_SESSION[$key] );
+    unset( $_SESSION[ $key ] );
 }
 
 function ses_id( $newID='' ) {
