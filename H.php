@@ -181,7 +181,8 @@ function res_json( $data ) {
 function res_jsonp( $data, $callback='callback' ) {
   if ( !isset( $_GET[ $callback ] ) ) die( 'No JSONP Callback `' . $callback . '`' );
   res_type( 'text/javascript' );
-  echo $_GET[ $callback ] . '(' . json_encode( $data ) .');';
+  $callback = preg_replace( '/[^\[\]\w$.]/g', '', $_GET[ $callback ] );
+  echo '/**/ typeof ' . $callback . ' === "function" && ' . $callback . '(' . json_encode( $data ) .');';
 }
 
 function esc( $var ) {
