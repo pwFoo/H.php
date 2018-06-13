@@ -105,6 +105,37 @@ Example:
   }
 ```
 
+Another interesting H.php function is the `route_base()` that allows you to group routes with the same base together.
+
+```php
+  route_base( $base, $routes=array() )
+```
+> This function can be used to group routes or endpoints together. parameters explanations:-
+
+> `$base` The routes group endpoint e.g `/api/v1`
+> `$routes` Arrays of of each subroutes in `Key-Value` pairs, the `Key` will look like something like `METHOD => /my_path`. Notice: it is almost same as the `route( $method, $regex_path, $callable_handler );`, just that you will separate `$method` and `$regex_path` with `=>` in the same string and the `Value` will be the `$callable_handler`.
+
+>You can do anything possible with `route()`
+Below is an example / use-case when you need want to update API version without bringing down the first version.
+
+```php
+  # index.php
+
+  # Greeter v1 routes
+  route_base( '/api/v1', array(
+    'GET => /greet/(\w)' => function( $name ) {
+      return 'Hello ' . $name . ' from the Old Greeter API';
+    }
+  ) );
+
+  # Greeter v2 routes, Added support for POST and PUT and also a new greetings message
+  route_base( '/api/v2', array(
+    'GET|POST|PUT => /greet/(\w)' => function( $name ) {
+      return 'Greetings ' . $name . ', from the New Greeter API';
+    }
+  ) );
+```
+
 <a id="request"></a>
 ### Request
 H.php comes with functions that you can use to interact with Client Request Headers and Variabless.

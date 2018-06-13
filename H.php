@@ -2,8 +2,9 @@
 /**
  * H.php | The Minimalist PHP Framework!
  * @author Oyedele Hammed (devHammed)
+ * @package H.php
  * @see http://github.com/devHammed/H.php
- * @version 1.2.1
+ * @version 1.2.2
  * @license MIT License
  */
 
@@ -30,6 +31,15 @@ function route( $type, $regex, $fn ) {
     }
     array_shift( $args );
     die( call_user_func_array( $fn, array_values( $args ) ) );
+  }
+}
+
+function route_base( $base, $routes=array() ) {
+  foreach ( $routes as $route => $handler ) {
+    $route = explode( '=>', $route );
+    $method = trim( $route[0] );
+    $path = $base . trim( $route[1] );
+    route( $method, $path, $handler );
   }
 }
 
@@ -107,7 +117,9 @@ function req_session( $key, $def='' ) {
 }
 
 function req_method( $key='' ) {
-  $method = isset( $_REQUEST[ '_method' ] ) ? strtoupper( $_REQUEST[ '_method' ] ) : strtoupper( getenv( 'request_method' ) );
+  $method = isset( $_REQUEST[ '_method' ] )
+    ? strtoupper( $_REQUEST[ '_method' ] )
+    : strtoupper( getenv( 'request_method' ) );
   return ( !empty( $key ) ) ? ( $method == strtoupper( $key ) ) : $method;
 }
 
@@ -126,7 +138,8 @@ function req_header( $key ) {
 }
 
 function req_env( $key='' ) {
-  return getenv( $key );
+  $key = strtoupper( $key );
+  return isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : getenv( $key );
 }
 
 function req_base( $str='/' ) {
