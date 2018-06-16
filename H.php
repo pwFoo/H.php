@@ -224,9 +224,9 @@ function cookie_has( $key ) {
   return isset( $_COOKIE[ $key ] );
 }
 
-function cookie_delete( $key, $path='/', $domain=null, $httponly=null ) {
+function cookie_delete( $key, $path='/', $domain=NULL, $httponly=NULL ) {
   if ( cookie_has( $key ) ) {
-    cookie_set( $key, null, time() - (3600 * 3650), $path, $domain, $httponly );
+    cookie_set( $key, NULL, time() - (3600 * 3650), $path, $domain, $httponly );
   }
 }
 
