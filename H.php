@@ -127,10 +127,10 @@ function req_method( $key='' ) {
 
 function req_header( $key ) {
   foreach ( $_SERVER as $k => $v ) {
-    if ( 'HTTP_' == substr( $k, 0, 5 ) ) {
+    if ( substr( $k, 0, 5 ) == 'HTTP_' ) {
       $k = str_replace( '_', '-', substr( $k, 5 ) );
       $headers[ $k ] = $v;
-    } elseif ( 'CONTENT_TYPE' == $k || 'CONTENT_LENGTH' == $k ) {
+    } elseif ( $k == 'CONTENT_TYPE' || $k == 'CONTENT_LENGTH' ) {
       $k = str_replace( '_', '-', $k );
       $headers[ $k ] = $v;
     }
@@ -181,7 +181,7 @@ function res_type( $type ) {
 
 function res_render( $file='', $vars='' ) {
   $file = config_get( 'views_dir', 'views/' ) . $file . '.php';
-  if ( !file_exists( $file ) ) {
+  if ( ! file_exists( $file ) ) {
     die( 'View not found: ' . $file );
   }
   if ( is_array( $vars ) ) {
@@ -198,7 +198,7 @@ function res_json( $data ) {
 }
 
 function res_jsonp( $data, $callback='callback' ) {
-  if ( !isset( $_GET[ $callback ] ) ) {
+  if ( ! isset( $_GET[ $callback ] ) ) {
     die( "No JSONP Callback `{$callback}`" );
   }
   res_type( 'text/javascript' );
