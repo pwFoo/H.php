@@ -249,13 +249,18 @@ H.php comes with functions to send response and views to the client.
 > Set the response Content type e.g `application/json`.
 
 ```php
-  # $name ( string ): The name of the template to include from the path defined in consfiguration `VIEWS_DIR`. you also dont need to append `.php` extension.
+  # $name ( string ): The filename of the template to be included from the directory path defined in configuration `VIEWS_DIR`. you dont need to append `.php` extension.
 
-  # $data ( associative array ): The data that get passed to the View.
+  # $vars ( associative array ): The data that get passed to the View.
 
-  res_render( $name, $data );
+  res_render( $name, $vars=NULL );
 ```
 > This function can be used to render native PHP templates to the browser.
+
+```php
+  res_renderStr( $tpl, $vars=NULL );
+```
+> This works almost like `res_render()` but it renders template from `$tpl` string instead of a file.
 
 ```php
   esc( $var );
