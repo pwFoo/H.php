@@ -244,8 +244,6 @@ function cookie_reset() {
   $_COOKIE[] = array();
 }
 
-
-
 # Session
 
 function ses_start() {
