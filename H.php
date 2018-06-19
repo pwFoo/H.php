@@ -172,14 +172,15 @@ function res_status( $code ) {
 }
 
 function res_back() {
-  res_redirect( req_header( 'Referer' ) );
+  $ref = isset( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : '';
+  res_redirect( $ref );
 }
 
 function res_type( $type ) {
   res_addHeader( 'Content-type: ' . $type );
 }
 
-function res_render( $file='', $vars='' ) {
+function res_render( $file='', $vars=NULL ) {
   $file = config_get( 'views_dir', 'views/' ) . $file . '.php';
   if ( ! file_exists( $file ) ) {
     die( 'View not found: ' . $file );
@@ -192,8 +193,17 @@ function res_render( $file='', $vars='' ) {
   return ob_get_clean();
 }
 
+function res_renderStr( $tpl, $vars=NULL ) {
+  if ( is_array( $vars ) ) {
+    extract( $vars );
+  }
+  ob_start();
+  eval( '?>' . $tpl );
+  return ob_get_clean();
+}
+
 function res_json( $data ) {
-  res_type( 'application/json;charset=utf8' );
+  res_type( 'application/json' );
   return json_encode( $data );
 }
 
@@ -212,12 +222,12 @@ function esc( $var ) {
 
 # Cookie
 
-function cookie_set( $key, $val='', $exp=NULL, $path='/',$domain=NULL, $secure=NULL, $httponly=NULL ) {
+function cookie_set( $key, $val=NULL, $exp=NULL, $path='/',$domain=NULL, $secure=NULL, $httponly=NULL ) {
   setcookie( $key, $val, time() + $exp, $path, $domain, $secure, $httponly );
 }
 
-function cookie_get( $key, $def='' ) {
-  return req_cookie( $key, $def );
+function cookie_get( $key, $def=NULL ) {
+  return cookie_has( $key ) ? $_COOKIE[ $key ] : $def;
 }
 
 function cookie_has( $key ) {
@@ -246,8 +256,8 @@ function ses_set( $key, $val ) {
    $_SESSION[ $key ] = $val;
 }
 
-function ses_get( $key, $def='' ) {
-  return req_session( $key, $def );
+function ses_get( $key, $def=NULL ) {
+  return ses_has( $key ) ? $_SESSION[ $key ] : $def;
 }
 
 function ses_has( $key ) {
@@ -260,7 +270,7 @@ function ses_delete( $key ) {
   }
 }
 
-function ses_id( $newID='' ) {
+function ses_id( $newID=NULL ) {
   return ( !empty( $newID ) ) ? session_id( $newID ) : session_id();
 }
 
@@ -276,12 +286,14 @@ function flash_set( $key, $val ) {
   }
   $_SESSION[ 'h_php_flash_msg' ][ $key ] = $val;
 }
+
 function flash_has( $key ) {
   if ( ! ses_id() ) {
     ses_start();
   }
   return isset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
 }
+
 function flash_get( $key ) {
   if ( ! ses_id() ) {
     ses_start();
@@ -293,6 +305,7 @@ function flash_get( $key ) {
   unset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
   return $val;
 }
+
 function flash_keep( $key ) {
   if ( ! ses_id() ) {
     ses_start();
