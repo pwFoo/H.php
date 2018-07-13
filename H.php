@@ -105,16 +105,8 @@ function req_raw( $key=NULL, $def=NULL ) {
   return isset( $rawBody[ $key ] ) ? $rawBody[ $key ] : $def;
 }
 
-function req_cookie( $key, $def=NULL ) {
-  return isset( $_COOKIE[ $key ] ) ? $_COOKIE[ $key ] : $def;
-}
-
 function req_file( $key ) {
   return isset( $_FILES[ $key ] ) ? $_FILES[ $key ] : NULL;
-}
-
-function req_session( $key, $def=NULL ) {
-  return isset( $_SESSION[ $key ] ) ? $_SESSION[ $key ] : $def;
 }
 
 function req_method( $key='' ) {
@@ -174,7 +166,8 @@ function res_status( $code ) {
 }
 
 function res_back() {
-  res_redirect( req_header( 'Referer' ) );
+  $ref = isset( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : '';
+  res_redirect( $ref );
 }
 
 function res_type( $type ) {
@@ -190,7 +183,7 @@ function res_render( $file='', $vars='' ) {
     extract( $vars );
   }
   ob_start();
-  require( $file );
+  include $file;
   return ob_get_clean();
 }
 
@@ -228,7 +221,7 @@ function cookie_set( $key, $val=NULL, $exp=NULL, $path='/',$domain=NULL, $secure
 }
 
 function cookie_get( $key, $def=NULL ) {
-  return req_cookie( $key, $def );
+  return cookie_has( $key ) ? $_COOKIE[ $key ] : $def;
 }
 
 function cookie_has( $key ) {
@@ -258,7 +251,7 @@ function ses_set( $key, $val ) {
 }
 
 function ses_get( $key, $def=NULL ) {
-  return req_session( $key, $def );
+  return ses_has( $key ) ? $_SESSION[ $key ] : $def;
 }
 
 function ses_has( $key ) {
@@ -287,12 +280,14 @@ function flash_set( $key, $val ) {
   }
   $_SESSION[ 'h_php_flash_msg' ][ $key ] = $val;
 }
+
 function flash_has( $key ) {
   if ( ! ses_id() ) {
     ses_start();
   }
   return isset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
 }
+
 function flash_get( $key ) {
   if ( ! ses_id() ) {
     ses_start();
@@ -304,6 +299,7 @@ function flash_get( $key ) {
   unset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
   return $val;
 }
+
 function flash_keep( $key ) {
   if ( ! ses_id() ) {
     ses_start();
