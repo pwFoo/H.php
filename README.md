@@ -43,7 +43,7 @@ H.php comes with Configuration helper functions that can be used to set in-memor
 > This function can be used for setting configurations and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. NOTE: to use features like Database, Including View files, you should set below configurations:
 
 * `views_dir` : the directory to load views from. default: `views/`.
-* `views_extensions`: View files extension e.g . default: `.php`
+* `views_extension`: View files extension e.g . default: `.php`
 * `db_host` : your database host. default: `localhost`.
 * `db_name` : your database name. default: `none`.
 * `db_user` : your database username. default: `root`.
@@ -76,9 +76,9 @@ H.php utilize simple and secured mechanism for it routing function `route()`. Be
 ```php
   route( $verb, $path, $callable_func );
 ```
-> $verb ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to handle multiple methods e.g `GET | POST`. NOTE: it is case-insensitive that is, `GET` is same as `get` or `Get` or `gEt`. :smile:
+> $verb ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to handle multiple methods e.g `GET | POST`. NOTE: it is case-insensitive that is, `GET` is same as `get` or `Get` or `gEt`.
 
-> $path ( string  | regexp ): The URL path to match against, to match dynamic routes prefix parameter's name with `@` e.g `/user/@name` and optional route path or parameters should be wrap in parentheses  e.g `/user(/@name)` and `/profile(/edit)`, you should always check if the optional part is provided before using it else you get `INDEX` error. All the dynamic parameters will be passed as a single Associative and Indexed Array to the handler function e.g `function( $args ){ // $args['name'] => Named // $args[0] => Indexed }`. You can add your own custom Regular Expressions for a Dynamic parameter by separating parameter name and Regular Expressions with `:` e.g `/user/@id:[0-9]+` or adding the Regex itself e.g `/user/[0-9]+` and remember you can only access it through it Index e.g `$args[0]`.
+> $path ( string  | regexp ): The URL path to match against, to match dynamic routes prefix parameter's name with `@` e.g `/user/@name` and optional route path or parameters should be wrap in parentheses  e.g `/user(/@name)` and `/profile(/edit)`, you should always check if the optional part is provided before using it else you get `INDEX` error. All the dynamic parameters will be passed as a single Associative and Indexed Array to the handler function. You can add your own custom Regular Expressions for a Dynamic parameter by separating parameter name and Regular Expressions with `:` e.g `/user/@id:[0-9]+` or adding the Regex itself e.g `/user/[0-9]+` and remember you can only access it through it Index e.g `$args[0]`.
 
 > $callable_func ( callable ): It can be a anonymous function, variable function, array object or any other valid callable in PHP, you can read docs for PHP [call_user_func()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better.
 
