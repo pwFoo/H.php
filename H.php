@@ -14,7 +14,8 @@ function route( $verb, $path, $func ) {
   $verb = explode( '|', $verb );
   $verb = array_map( 'trim', array_map( 'strtoupper', $verb ) );
   $script_name = isset( $_SERVER['SCRIPT_NAME'] ) ? $_SERVER['SCRIPT_NAME'] : 'index.php';
-  $request_uri = str_replace( dirname( $script_name ), '', $_SERVER[ 'REQUEST_URI' ] );
+  $request_uri = !empty( $_SERVER['REQUEST_URI'] ) ? $_SERVER[ 'REQUEST_URI' ] : '/';
+  $request_uri = str_replace( dirname( $script_name ), '', $request_uri );
   $path = '~^' . $path . '/?$~';
   $path = preg_replace_callback(
     '#@([\w]+)(:([^/()]*))?#',
