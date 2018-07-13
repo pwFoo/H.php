@@ -4,43 +4,41 @@
  * @author Oyedele Hammed (devHammed)
  * @package H.php
  * @see http://github.com/devHammed/H.php
- * @version 1.2.2
+ * @version 1.3.0
  * @license MIT License
  */
 
 # Route
 
-function route( $type, $regex, $fn ) {
-  $type = explode( '|', $type );
-  $type = array_map( 'trim', array_map( 'strtoupper', $type ) );
-  $path = ( ! empty( $_SERVER[ 'PATH_INFO' ] ) )
-    ? $_SERVER[ 'PATH_INFO' ]: '/';
-  $regex = "~^{$regex}/?$~";
-  $type_matched = ( in_array( 'ANY', $type ) || in_array( req_method(), $type ) );
-  if ( preg_match( $regex, $path, $args ) && $type_matched ) {
-    if ( is_string( $fn ) && strpos( $fn, '#' ) ) {
-      list( $ctrl, $method ) = explode( '#', $fn );
-      $ctrl_file = config_get( 'controllers_dir', 'controllers/' ) . $ctrl . '.php';
-      if ( ! file_exists( $ctrl_file ) ) {
-        die( 'No Controller: ' . $ctrl );
+function route( $verb, $path, $func ) {
+  $verb = explode( '|', $verb );
+  $verb = array_map( 'trim', array_map( 'strtoupper', $verb ) );
+  $script_name = isset( $_SERVER['SCRIPT_NAME'] ) ? $_SERVER['SCRIPT_NAME'] : 'index.php';
+  $request_uri = str_replace( dirname( $script_name ), '', $_SERVER[ 'REQUEST_URI' ] );
+  $path = '~^' . $path . '/?$~';
+  $path = preg_replace_callback(
+    '#@([\w]+)(:([^/()]*))?#',
+    function( $matches ) {
+      if ( isset( $matches[3] ) ) {
+        return '(?P<' . $matches[1] . '>' . $matches[3] . ')';
       }
-      include $ctrl_file;
-      if ( ! method_exists( $ctrl, $method ) ) {
-        die( 'No Method: ' . $method );
-      }
-      $fn = array( new $ctrl, $method );
-    }
+      return '(?P<' . $matches[1] . '>[^/]+)';
+    },
+    str_replace( ')', ')?', $path )
+  );
+  $verb_matched = in_array( 'ANY', $verb ) || in_array( req_method(), $verb );
+  if ( preg_match( $path, $request_uri, $args ) && $verb_matched ) {
     array_shift( $args );
-    die( call_user_func_array( $fn, array_values( $args ) ) );
+    die( call_user_func( $func, $args ) );
   }
 }
 
 function route_base( $base, $routes=array() ) {
-  foreach ( $routes as $route => $handler ) {
-    $route = explode( '=>', $route );
-    $method = trim( $route[0] );
-    $path = $base . trim( $route[1] );
-    route( $method, $path, $handler );
+  foreach ( $routes as $route => $func ) {
+    $route = explode( '->', $route );
+    $verb = trim( $route[0] );
+    $path = !empty( $route[1] ) ? $base . trim( $route[1] ) : $base;
+    route( $verb, $path, $func );
   }
 }
 
@@ -53,10 +51,10 @@ function db_run( $sql, $bind=array() ) {
   );
   $sql = trim( $sql );
   try {
-    $db_host = config_get( 'db_host', 'localhost' );
-    $db_name = config_get( 'db_name' );
-    $db_user = config_get( 'db_user', 'root' );
-    $db_pass = config_get( 'db_pass' );
+    $db_host = config_get( 'DB_HOST', 'localhost' );
+    $db_name = config_get( 'DB_NAME' );
+    $db_user = config_get( 'DB_USER', 'root' );
+    $db_pass = config_get( 'DB_PASS' );
     $dbh = new PDO( 'mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass, $options );
   } catch ( PDOException $e ) {
     die( 'Error connecting to the database!' );
@@ -65,7 +63,7 @@ function db_run( $sql, $bind=array() ) {
     $res = $dbh->prepare( $sql );
     $res->execute( $bind );
     return $res;
-  } catch (PDOException $e) {
+  } catch ( PDOException $e ) {
     die( 'Error executing SQL query!' );
   }
 }
@@ -81,23 +79,23 @@ function db_select( $sql, $bind=array() ) {
 
 # Request
 
-function req_get( $key, $def='' ) {
+function req_get( $key, $def=NULL ) {
   return isset( $_GET[ $key ] ) ? $_GET[ $key ] : $def;
 }
 
-function req_post( $key, $def='' ) {
+function req_post( $key, $def=NULL ) {
   return isset( $_POST[ $key ] ) ? $_POST[ $key ] : $def;
 }
 
-function req_put( $key, $def='' ) {
+function req_put( $key, $def=NULL ) {
     return req_method( 'PUT' ) ? req_raw( $key ) : $def;
 }
 
-function req_patch( $key, $def='' ) {
+function req_patch( $key, $def=NULL ) {
   return req_method( 'PATCH' ) ? req_raw( $key ) : $def;
 }
 
-function req_raw( $key='', $def='' ) {
+function req_raw( $key=NULL, $def=NULL ) {
   $input = file_get_contents( 'php://input' );
   if ( empty( $key ) ) {
     return $input;
@@ -106,7 +104,7 @@ function req_raw( $key='', $def='' ) {
   return isset( $rawBody[ $key ] ) ? $rawBody[ $key ] : $def;
 }
 
-function req_cookie( $key, $def='' ) {
+function req_cookie( $key, $def=NULL ) {
   return isset( $_COOKIE[ $key ] ) ? $_COOKIE[ $key ] : $def;
 }
 
@@ -114,15 +112,18 @@ function req_file( $key ) {
   return isset( $_FILES[ $key ] ) ? $_FILES[ $key ] : NULL;
 }
 
-function req_session( $key, $def='' ) {
+function req_session( $key, $def=NULL ) {
   return isset( $_SESSION[ $key ] ) ? $_SESSION[ $key ] : $def;
 }
 
 function req_method( $key='' ) {
-  $method = isset( $_REQUEST[ '_method' ] )
-    ? strtoupper( $_REQUEST[ '_method' ] )
-    : strtoupper( getenv( 'request_method' ) );
-  return ( ! empty( $key ) ) ? ( $method == strtoupper( $key ) ) : $method;
+  $verb = strtoupper( $_SERVER['REQUEST_METHOD'] );
+  if ( isset( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ) ) {
+    $verb = strtoupper( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] );
+  } else {
+    $verb = isset( $_POST['_method'] ) ? strtoupper( $_POST['_method'] ) : $verb;
+  }
+  return empty( $key ) ? $verb : (strtoupper( $key ) === $verb);
 }
 
 function req_header( $key ) {
@@ -130,7 +131,7 @@ function req_header( $key ) {
     if ( substr( $k, 0, 5 ) == 'HTTP_' ) {
       $k = str_replace( '_', '-', substr( $k, 5 ) );
       $headers[ $k ] = $v;
-    } elseif ( $k == 'CONTENT_TYPE' || $k == 'CONTENT_LENGTH' ) {
+    } elseif ( $k === 'CONTENT_TYPE' || $k === 'CONTENT_LENGTH' ) {
       $k = str_replace( '_', '-', $k );
       $headers[ $k ] = $v;
     }
@@ -144,12 +145,12 @@ function req_env( $key='' ) {
   return isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : getenv( $key );
 }
 
-function req_base( $str='/' ) {
+function req_base( $str='' ) {
   return str_replace( '\\', '', dirname( req_env( 'SCRIPT_NAME' ) ) ) . $str;
 }
 
-function req_site( $str='/' ) {
-  $protocol = ( ! empty( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] == 'on' || $_SERVER[ 'SERVER_PORT' ] == 443 )
+function req_site( $str='' ) {
+  $protocol = ( ! empty( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on' || $_SERVER[ 'SERVER_PORT' ] === 443 )
   ? "https://" : "http://";
   $domainName = $_SERVER[ 'HTTP_HOST' ];
   return $protocol . $domainName . $str;
@@ -172,18 +173,17 @@ function res_status( $code ) {
 }
 
 function res_back() {
-  $ref = isset( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : '';
-  res_redirect( $ref );
+  res_redirect( req_header( 'Referer' ) );
 }
 
 function res_type( $type ) {
   res_addHeader( 'Content-type: ' . $type );
 }
 
-function res_render( $file='', $vars=NULL ) {
-  $file = config_get( 'views_dir', 'views/' ) . $file . '.php';
+function res_render( $file='', $vars='' ) {
+  $file = config_get( 'VIEWS_DIR', 'views/' ) . $file . config_get( 'VIEWS_EXTENSION', '.php' );
   if ( ! file_exists( $file ) ) {
-    die( 'View not found: ' . $file );
+    die( 'View file not found: ' . $file );
   }
   if ( is_array( $vars ) ) {
     extract( $vars );
@@ -207,13 +207,13 @@ function res_json( $data ) {
   return json_encode( $data );
 }
 
-function res_jsonp( $data, $callback='callback' ) {
-  if ( ! isset( $_GET[ $callback ] ) ) {
-    die( "No JSONP Callback `{$callback}`" );
+function res_jsonp( $data, $func='callback' ) {
+  if ( ! isset( $_GET[ $func ] ) ) {
+    die( 'No JSONP Callback `'. $func . '`' );
   }
   res_type( 'text/javascript' );
-  $callback = preg_replace( '/[^\[\]\w$.]/g', '', $_GET[ $callback ] );
-  echo '/**/ typeof ' . $callback . ' === "function" && ' . $callback . '(' . json_encode( $data ) .');';
+  $func = preg_replace( '/[^\[\]\w$.]/g', '', $_GET[ $func ] );
+  echo '/**/ typeof ' . $func . ' === "function" && ' . $func . '(' . json_encode( $data ) .');';
 }
 
 function esc( $var ) {
@@ -227,7 +227,7 @@ function cookie_set( $key, $val=NULL, $exp=NULL, $path='/',$domain=NULL, $secure
 }
 
 function cookie_get( $key, $def=NULL ) {
-  return cookie_has( $key ) ? $_COOKIE[ $key ] : $def;
+  return req_cookie( $key, $def );
 }
 
 function cookie_has( $key ) {
@@ -244,6 +244,8 @@ function cookie_reset() {
   $_COOKIE[] = array();
 }
 
+
+
 # Session
 
 function ses_start() {
@@ -255,7 +257,7 @@ function ses_set( $key, $val ) {
 }
 
 function ses_get( $key, $def=NULL ) {
-  return ses_has( $key ) ? $_SESSION[ $key ] : $def;
+  return req_session( $key, $def );
 }
 
 function ses_has( $key ) {
@@ -268,7 +270,7 @@ function ses_delete( $key ) {
   }
 }
 
-function ses_id( $newID=NULL ) {
+function ses_id( $newID='' ) {
   return ( !empty( $newID ) ) ? session_id( $newID ) : session_id();
 }
 
@@ -284,14 +286,12 @@ function flash_set( $key, $val ) {
   }
   $_SESSION[ 'h_php_flash_msg' ][ $key ] = $val;
 }
-
 function flash_has( $key ) {
   if ( ! ses_id() ) {
     ses_start();
   }
   return isset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
 }
-
 function flash_get( $key ) {
   if ( ! ses_id() ) {
     ses_start();
@@ -303,7 +303,6 @@ function flash_get( $key ) {
   unset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
   return $val;
 }
-
 function flash_keep( $key ) {
   if ( ! ses_id() ) {
     ses_start();
@@ -315,6 +314,7 @@ function flash_keep( $key ) {
 }
 
 # Hash
+
 function hash_make( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
   return password_hash( $str, $algo, $opts );
 }
@@ -332,6 +332,7 @@ function hash_random( $length=32 ) {
 }
 
 # Configuration
+
 function config_set( $key, $val ) {
   $key = strtolower( $key );
   $GLOBALS[ 'h_php_config' ][ $key ] = $val;

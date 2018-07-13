@@ -1,11 +1,14 @@
 # H.php
 
+![H.php Logo](H.png)
+
 > The Minimalist PHP Framework!
 
 ## Table of Contents
 * [Introduction](#intro)
 * [Installation](#install)
-* [Configuration](#config)
+* [Tests](#tests)
+* [Configuration](#configuration)
 * [Routes](#routes)
 * [Request](#request)
 * [Response](#response)
@@ -20,30 +23,31 @@
 
 <a id="intro"></a>
 ### Introduction
-> H.php is a Minimal and Lighweight PHP Function-based MVC-ish framework that is designed for you to prototype and build Web Applications and APIs without stress.
+> H.php is a Minimal and Lightweight PHP Function-based MVC-ish framework that is designed for you to prototype and build Web Applications and APIs without stress.
 
 <a id="install"></a>
 ### Installation
-Download latest release zip archive [here](https://github.com/devHammed/H.php/releases/latest) then extract and you will just have to copy `.htaccess` file to your app root and `H.php` file in your project then you will require it! e.g if `H.php` is in the `lib` folder :-
-```php
-  require 'lib/H.php';
-```
-Note: If your Web Server doesn't support rewrite, your app will still work e.g `index.php/about`.
+Download latest release zip archive [here](https://github.com/devHammed/H.php/releases/latest) then extract and copy `.htaccess` file to your project root and `H.php` file in your project then you will require the file. If you are running PHP Built-in server you don't need the `.htaccess`, H.php will take care of the route handling when you start the server with the command `php -S localhost:PORT index.php` this would ensure that `index.php` handles all the Requests, you can also add `-t` option to set custom Document root. For Nginx users, check `nginx` file and add the contents to your server configurations.
 
-<a id="config"></a>
+<a id="tests"></a>
+### Tests
+To run Tests for the functions in this framework check `tests.php` and follow the instructions in the file header comments.
+
+<a id="configuration"></a>
 ### Configuration
-H.php comes with Configuration helper functions that can be used to set in-memory configurations.
+H.php comes with Configuration helper functions that can be used to set in-memory/runtime configurations.
 
 ```php
     config_set( $key, $value );
 ```
-> This function can be used for setting configurations and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. NOTE: to use features like Database, Autoloading classes and View, you should set below configurations:
-* `controllers_dir`: the directory to load controller classes from. default: controllers/.
-* `views_dir` : the directory to load views from. default: views/.
-* `db_host` : your database host. default: localhost.
-* `db_name` : your database name. default: none.
-* `db_user` : your database username. default: root.
-* `db_pass` : your database password. default: none.
+> This function can be used for setting configurations and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. NOTE: to use features like Database, Including View files, you should set below configurations:
+
+* `views_dir` : the directory to load views from. default: `views/`.
+* `views_extensions`: View files extension e.g . default: `.php`
+* `db_host` : your database host. default: `localhost`.
+* `db_name` : your database name. default: `none`.
+* `db_user` : your database username. default: `root`.
+* `db_pass` : your database password. default: `none`.
 
 ```php
     config_get( $key, $default=NULL );
@@ -67,34 +71,78 @@ H.php comes with Configuration helper functions that can be used to set in-memor
 
 <a id="routes"></a>
 ### Routes
-H.php utilize Regular Expression for it routing function `route()`. Below is the signature for this function :-
+H.php utilize simple and secured mechanism for it routing function `route()`. Below is the documentation for this function :-
 
 ```php
-  route( $method, $regex_path, $callable_handler );
+  route( $verb, $path, $callable_func );
 ```
-> $method ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to match multiple methods e.g `GET | POST`. NOTE: it is case-insensitve for your happiness so, `GET` is same as `get` or `Get` or `gEt`. :smile:
+> $verb ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to handle multiple methods e.g `GET | POST`. NOTE: it is case-insensitive that is, `GET` is same as `get` or `Get` or `gEt`. :smile:
 
-> $regex_path ( string  | regex ): The pattern to match, NOTE: you don't need to write full regex, just the string e.g `/` or to match dynmaic routes `/user/(\w+)/` and optional parameters can be suffixed with `?` e.g `/user/(\w+)?/`. All the captures in this regexp will be passed in order to the `$handler` callable function and remember to use default argument for optional parameters e.g `function( $user=NULL ){ ... }`.
+> $path ( string  | regexp ): The URL path to match against, to match dynamic routes prefix parameter's name with `@` e.g `/user/@name` and optional route path or parameters should be wrap in parentheses  e.g `/user(/@name)` and `/profile(/edit)`, you should always check if the optional part is provided before using it else you get `INDEX` error. All the dynamic parameters will be passed as a single Associative and Indexed Array to the handler function e.g `function( $args ){ // $args['name'] => Named // $args[0] => Indexed }`. You can add your own custom Regular Expressions for a Dynamic parameter by separating parameter name and Regular Expressions with `:` e.g `/user/@id:[0-9]+` or adding the Regex itself e.g `/user/[0-9]+` and remember you can only access it through it Index e.g `$args[0]`.
 
-> $callable_handler ( callable ): It can be a anonymous function, variable function or any other valid callablea in PHP, you can read docs for PHP [call_user_func_array()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better. Also you can use a string that separates Class and Method by `#`, your Class will be Auto-loaded from the path specified in `CONTROLLERS_DIR` configuration e.g `BookController#addBook`.
+> $callable_func ( callable ): It can be a anonymous function, variable function, array object or any other valid callable in PHP, you can read docs for PHP [call_user_func()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better.
 
 Example:
 
 ```php
   # index.php
+  include 'myControllers/BooksController.php';
 
-  config_set( 'CONTROLLERS_DIR', 'myContollers/' );
+  # Index Route that handle any method
 
   route( 'ANY', '/', function(){
     return 'Hello World'; # you can also use `echo`
   } );
 
-  route( 'GET | POST', '/echo/(\w+)', function( $text ){
+  # Multiple method and Dynamic parameter
+
+  route( 'GET | POST', '/echo/@text', function( $args ){
     config_set( 'page_title', 'Echo World' );
-    return config_get( 'page_title' ) . ' ' . $text; # a view can be used instead!
+    return config_get( 'page_title' ) . ' ' . $args['text']; # a view can be used instead!
   } );
 
-  route( 'GET', '/books', 'BooksController#index' );
+  # Optional parameter
+
+  route( 'GET', '/optional(/@optional_arg)', function( $args ) {
+    if ( !isset( $args['optional_arg'] ) ) {
+      return 'Optional: not provided!';
+    }
+    return 'Optional: provided';
+  } );
+
+  # Optional Parameter that includes a required parameter
+
+  route( 'GET', '/optional(/@opt_arg_with_path)/edit', function( $args ) {
+    if ( !isset( $args['optional_arg_with_path'] ) ) {
+      return 'Optional: not provided!';
+    }
+    return 'Optional: provided';
+  } );
+
+  # Optional Named Dynamic parameter with custom regex
+
+  route( 'GET', '/optional(/@optional_arg_regex:[0-9]+)', function( $args ) {
+    if ( !isset( $args['optional_arg_regex'] ) ) {
+      return 'Optional: not provided!';
+    }
+    return 'Optional: provided';
+  } );
+
+  # Named Dynamic parameter with custom regex
+
+  route( 'GET', '/@my_regex:[0-9]+', function( $args ) {
+    return $args['my_regex'];
+  } );
+
+  # Indexed Dynamic parameter with custom regex
+
+  route( 'GET', '/user/[0-9]+', function( $args ) {
+    return $args[0];
+  } );
+
+  # Route using Class method
+
+  route( 'GET', '/books', array( new BooksController(), 'index' ) );
 
   # myControllers/BooksController.php
 
@@ -105,7 +153,7 @@ Example:
   }
 ```
 
-Another interesting H.php function is the `route_base()` that allows you to group routes with the same base together.
+Another interesting H.php function is the `route_base()` that allows you to group routes with the same base path together.
 
 ```php
   route_base( $base, $routes=array() )
@@ -113,7 +161,7 @@ Another interesting H.php function is the `route_base()` that allows you to grou
 > This function can be used to group routes or endpoints together. parameters explanations:-
 
 > `$base` The routes group endpoint e.g `/api/v1`
-> `$routes` Arrays of of each subroutes in `Key-Value` pairs, the `Key` will look like something like `METHOD => /my_path`. Notice: it is almost same as the `route( $method, $regex_path, $callable_handler );`, just that you will separate `$method` and `$regex_path` with `=>` in the same string and the `Value` will be the `$callable_handler`.
+> `$routes` Arrays of of each sub-routes in `Key-Value` pairs, the `Key` will look like something like `METHOD -> /my_path`. Notice: it is almost same as the `route( $method, $regex_path, $callable_handler );`, just that you will separate `$method` and `$regex_path` with `->` in the same string and the `Value` will be the `$callable_handler`.
 
 >You can do anything possible with `route()`
 Below is an example / use-case when you need want to update API version without bringing down the first version.
@@ -123,61 +171,61 @@ Below is an example / use-case when you need want to update API version without 
 
   # Greeter v1 routes
   route_base( '/api/v1', array(
-    'GET => /greet/(\w)' => function( $name ) {
-      return 'Hello ' . $name . ' from the Old Greeter API';
+    'GET -> /greet/@name' => function( $args ) {
+      return 'Hello ' . $args['name'] . ' from the Old Greeter API';
     }
   ) );
 
   # Greeter v2 routes, Added support for POST and PUT and also a new greetings message
   route_base( '/api/v2', array(
-    'GET|POST|PUT => /greet/(\w)' => function( $name ) {
-      return 'Greetings ' . $name . ', from the New Greeter API';
+    'GET|POST|PUT -> /greet/@name' => function( $args ) {
+      return 'Greetings ' . $args['name'] . ', from the New Greeter API';
     }
   ) );
 ```
 
 <a id="request"></a>
 ### Request
-H.php comes with functions that you can use to interact with Client Request Headers and Variabless.
+H.php comes with functions that you can use to interact with Client Request Headers and Variables.
 
 ```php
-  req_get( $key, $def='' );
+  req_get( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_GET array else it will return $def.
 
 ```php
-  req_post( $key, $def='' );
+  req_post( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_POST array else it will return $def.
 
 ```php
-  req_put( $key, $def='' );
+  req_put( $key, $def=NULL );
 ```
 > The function will return the value for $key in PUT request array else it will return $def.
 
 ```php
-  req_patch( $key, $def='' );
+  req_patch( $key, $def=NULL );
 ```
 > The function will return the value for $key in PATCH request array else it will return $def.
 
 ```php
-  req_raw( $key='', $def='' );
+  req_raw( $key=NULL, $def=NULL );
 ```
 
 > The function will return the value for $key in raw request body else return $def, if none is defined then the function returns unparsed request body.
 
 ```php
-  req_cookie( $key, $def='' );
+  req_cookie( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_COOKIE array else it will return $def.
 
 ```php
-  req_session( $key, $def='' );
+  req_session( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_SESSION array else it will return $def.
 
 ```php
-  req_file( $key, $def='' );
+  req_file( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_FILES array else it will return $def.
 
@@ -185,7 +233,7 @@ H.php comes with functions that you can use to interact with Client Request Head
   req_method( $compare );
 ```
 
-> The function returns the Request Method and if $compare is passed it will compare it and returns true/false. NOTE: To emulate PUT/PATCH/DELETE in HTML forms, use a form with `method="POST"` and you will add a hidden input with name `_method` and the method as the value.
+> The function returns the Request Method and if $compare is passed it will compare it and returns true/false. NOTE: To emulate PUT/PATCH/DELETE in HTML forms, use a form with `method="POST"` and you will add a hidden input with name `_method` and the method as the value. You can also method override with `X-HTTP-METHOD-OVERRIDE` header.
 
 ```php
   req_env( $variable );
@@ -196,7 +244,7 @@ H.php comes with functions that you can use to interact with Client Request Head
 ```php
     req_header( $key );
 ```
-> This function can be used to get a Client Request Header e.g `X-Requested-With`, `Content-Type` etc.
+> This function can be used to get a Client Request Headers e.g `X-Requested-With`, `Content-Type`, `X-API-Key` etc.
 
 ```php
   req_base( $str='' );
@@ -205,15 +253,15 @@ H.php comes with functions that you can use to interact with Client Request Head
   # returns `/my_app`
 ```
 
-> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`.
+> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`. if the project is not in a sub-directory, it will return empty string.
 
 ```php
-  req_site( $str='/' );
+  req_site( $str='' );
 
-  # URL: localhost/my_app/about | returns: http(s)://localhost/
-  # URL: www.mylivewebsite.tld/about | returns: http(s)://www.mylivewebsite.com/
+  # URL: localhost/my_app/about | returns: http(s)://localhost
+  # URL: www.mylivewebsite.tld/about | returns: http(s)://www.mylivewebsite.com
 ```
-> This function returns the current domain and protocol, it is useful when you want to get full website URL without hard-coding it. if `$str` is defined, it will be appended to the returned URL, by default `$str` is `/` and it is recommended to use it with `req_base()` to get accurate full URL, especially in localhost.
+> This function returns the current domain and protocol, it is useful when you want to get full website URL without hard-coding it. if `$str` is defined, it will be appended to the returned URL, by default `$str` is empty and it is recommended to use it with `req_base()` to get accurate full URL, especially in localhost where you have not setup Virtual host.
 
 
 <a id="response"></a>
@@ -280,7 +328,7 @@ H.php comes with functions to send response and views to the client.
 Below are the guidelines on how to use native PHP for template:-
 - Always use HTML with inline PHP. Never use blocks of PHP.
 - Always use `esc( $var )` function to escape potentially dangerous variables.
-- Always add `<?php if ( !defined( 'H_PHP' ) ) die( 'Permission denied!' ) ?>` at the top of your view file to prevent direct access to it.
+- Always add `<?php if ( ! defined( 'H_PHP' ) ) die( 'Permission denied!' ) ?>` at the top of your view file to prevent direct access to it.
 - Always use the short echo syntax (`<?=`) when outputting variables. For other inline PHP code, use the full `<?php` tag.
 - Always use the [PHP alternative syntax for control structures](http://php.net/manual/en/control-structures.alternative-syntax.php), which are designed to make templates more legible.
 - Never use PHP curly brackets.
@@ -295,14 +343,20 @@ Example:
 
   config_set( 'VIEWS_DIR', 'myViews/' );
 
-  route( 'GET', '/user/(\w+)', function( $user ){
+  route( 'GET', '/user', function() {
+    return res_render( 'listUsersView', array(
+      'users' => 'John Doe' //some data here
+    ))
+  } );
+
+  route( 'GET', '/user/@name', function( $args ) {
     return res_render( 'userView', array(
-      'name' => $user,
+      'name' => $args['name'],
     ) );
   } );
 
   # myViews/userView.php
-  <?php if ( !config_has( 'h_php_init' ) ) die(); ?>
+  <?php if ( ! defined( 'H_PHP' ) ) die( 'Permission Denied!' ); ?>
 
   <?= esc( $name ) ?>
 ```
@@ -333,7 +387,7 @@ route( 'GET', '/posts', function(){
 } );
 
 # views/postsView.php
-  <?php if ( !config_has( 'h_php_init' ) ) die(); ?>
+  <?php if ( ! defined( 'H_PHP' ) ) die( 'Permission Denied!' ); ?>
 
   <?php if ( count( $posts ) ): ?>
     <?php foreach ( $posts as $post ): ?>
@@ -487,7 +541,7 @@ H.php also has functions that can be used to hash passwords or strings, the func
 ```
 > This function can be used to generate secure hash for `$str`.
 
->`$algo` is the algoritm to use when generating hash, it can be `PASSWORD_DEFAULT` or `PASSWORD_BCRYPT` or `PASSWORD_ARGON2I`. it defaults to `PASSWORD_DEFAULT` which will use the latest secured algorithm in PHP.
+>`$algo` is the algorithm to use when generating hash, it can be `PASSWORD_DEFAULT` or `PASSWORD_BCRYPT` or `PASSWORD_ARGON2I`. it defaults to `PASSWORD_DEFAULT` which will use the latest secured algorithm in PHP.
 
 > `$opts` are options to use when generating, Read more at [PHP password_hash](http://php.net/manual/en/function.password-hash.php).
 
@@ -496,7 +550,7 @@ H.php also has functions that can be used to hash passwords or strings, the func
 ```php
   hash_check( $str, $hash );
 ```
-> This function can be used to verify a `$hash` against `$str`, returns `TRUE` if it is valid else returns `FALSE`. This is useful for verifying password entered by user againt the hashed version in the database. Read more at [PHP password_verify](http://php.net/manual/en/function.password-verify.php).
+> This function can be used to verify a `$hash` against `$str`, returns `TRUE` if it is valid else returns `FALSE`. This is useful for verifying password entered by user against the hashed version in the database. Read more at [PHP password_verify](http://php.net/manual/en/function.password-verify.php).
 
 ```php
   hash_needsRehash( $hash, $algo=PASSWORD_DEFAULT, $opts=NULL );
@@ -520,7 +574,7 @@ Below are links to some resources and examples to get you started.
 
 <hr>
 
-Thanks, did you want to contribute? fork this repo and send pull requests.
+Thanks, did you want to contribute? fork this repository and send pull requests.
 
 Creator:- [Oyedele Hammed Horlah](https://devhammed.github.io)
 
