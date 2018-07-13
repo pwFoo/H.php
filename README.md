@@ -215,16 +215,6 @@ H.php comes with functions that you can use to interact with Client Request Head
 > The function will return the value for $key in raw request body else return $def, if none is defined then the function returns unparsed request body.
 
 ```php
-  req_cookie( $key, $def=NULL );
-```
-> The function will return the value for $key in $_COOKIE array else it will return $def.
-
-```php
-  req_session( $key, $def=NULL );
-```
-> The function will return the value for $key in $_SESSION array else it will return $def.
-
-```php
   req_file( $key, $def=NULL );
 ```
 > The function will return the value for $key in $_FILES array else it will return $def.
