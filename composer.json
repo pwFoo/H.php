@@ -1,7 +1,7 @@
 {
     "name": "devhammed/h-php",
     "description": "H.php | The Minimalist PHP Framework!",
-    "type": "framework",
+    "type": "project",
     "license": "MIT",
     "version": "2.0",
     "keywords": [ "h.php", "h-php", "micro framework", "php" ],
