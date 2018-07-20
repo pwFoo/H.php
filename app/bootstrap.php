@@ -1,18 +1,6 @@
 <?php
 
-define( 'H_PHP_DIR', $_SERVER[ 'DOCUMENT_ROOT' ] . '/' ); // App Path
-
-define( 'H_PHP_CORE', H_PHP_DIR.'/core' ); // H.php Core
-
-define( 'H_PHP_ENVIRONMENT', 'development' ); // Options: development, testing, production
-
-define( 'H_PHP_CONTROLLERS', 'app/Controllers' ); // Controllers Directory
-
-define( 'H_PHP_MODELS', 'app/Models' ); // Models Directory
-
-define( 'H_PHP_VIEWS', 'app/Views' ); // Views Directory
-
-// Stop Editing!
+require_once 'config.php';
 
 switch ( H_PHP_ENVIRONMENT ) {
   case 'development':
@@ -31,44 +19,22 @@ switch ( H_PHP_ENVIRONMENT ) {
 }
 
 
-$scan_core_files = array_diff( scandir( H_PHP_DIR.'core' ), array( '..', '.' ) );
-foreach ( $scan_core_files as $scf ) {
-  try {
-    require_once H_PHP_DIR .'/core/'. $scf;
-  } catch ( Exception $e ) {
-    die( 'Failed to autoload core files' );
-  }
+$core_files = array_diff( scandir( H_PHP_DIR.'core' ), array( '..', '.' ) );
+foreach ( $core_files as $core_file ) {
+  require_once H_PHP_DIR . '/core/' . $core_file;
 }
 
-try {
-  $CONFIG = require_once 'config.php';
-} catch ( Exception $e ) {
-  throw new Exception( 'Could not load config file!' );
+$controller_files = array_diff( scandir( H_PHP_DIR.H_PHP_CONTROLLERS ), array( '..', '.' ) );
+foreach ( $controller_files as $controller_file ) {
+  require_once H_PHP_DIR . H_PHP_CONTROLLERS. '/' . $controller_file;
 }
 
-
-$scan_controllers_dir = array_diff( scandir( H_PHP_DIR.H_PHP_CONTROLLERS ), array( '..', '.' ) );
-foreach ($scan_controllers_dir as $scd) {
-  try {
-    require_once H_PHP_DIR . H_PHP_CONTROLLERS. '/' . $scd;
-  } catch ( Exception $e ) {
-    die( 'Failed to autoload controllers' );
-  }
+$model_files = array_diff( scandir( H_PHP_DIR.H_PHP_MODELS ), array('..', '.') );
+foreach ( $model_files as $model_file ) {
+  require_once H_PHP_DIR . H_PHP_MODELS.'/'. $model_file;
 }
 
-$scan_models_dir = array_diff( scandir( H_PHP_DIR.H_PHP_MODELS ), array('..', '.') );
-foreach ( $scan_models_dir as $smd ) {
-  try {
-    require_once H_PHP_DIR . H_PHP_MODELS.'/'.$smd;
-  } catch ( Exception $e ) {
-    die( 'Failed to autoload models' );
-  }
-}
-
-try {
-  if ( $CONFIG[ 'load_composer' ] === TRUE ) {
-    require_once H_PHP_DIR . 'vendor/autoload.php';
-  }
-} catch ( Exception $e ) {
-  throw new Exception( 'Failed to load composer' );
+$composer = H_PHP_DIR . 'vendor/autoload.php';
+if ( file_exists( $composer ) ) {
+  require_once $composer;
 }
