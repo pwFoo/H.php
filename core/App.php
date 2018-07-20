@@ -15,8 +15,8 @@ class App {
       'session' => new Session(),
       'flash' => new Flash(),
       'hash' => new Hash(),
-      'args' => array(),
-      'plugins' => array(),
+      'config' => new Config(),
+      'args' => array()
     );
   }
 
@@ -63,10 +63,6 @@ class App {
       $path = !empty( $route[1] ) ? $base . trim( $route[1] ) : $base;
       $this->map( $verb, $path, $func );
     }
-  }
-
-  function plugin( $key, $val ) {
-    $this->app->plugins[ $key ] = $val;
   }
 
   function notFound( $func ) {
