@@ -1,15 +1,20 @@
 {
     "name": "devhammed/h-php",
     "description": "H.php | The Minimalist PHP Framework!",
-    "type": "library",
+    "type": "framework",
     "license": "MIT",
+    "version": "2.0",
+    "keywords": [ "h.php", "h-php", "micro framework", "php" ],
     "authors": [
         {
             "name": "Oyedele Hammed",
-            "email": "itz.harmid@gmail.com"
+            "email": "itz.harmid@gmail.com",
+            "role": "Developer",
+            "homepage": "https://www.oyedelehammed.ml"
         }
     ],
     "require": {
       "php": ">=5.3.0"
-    }
+    },
+    "minimum-stability": "dev"
 }

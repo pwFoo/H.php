@@ -2,7 +2,6 @@
 
 location / {
   if (!-e $request_filename){
-    include fastcgi_params;
     rewrite ^(.*)$ /index.php break;
   }
 }
