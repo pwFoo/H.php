@@ -23,11 +23,15 @@
 
 <a id="intro"></a>
 ### Introduction
-> H.php is a Minimal and Lightweight PHP Function-based MVC-ish framework that is designed for you to prototype and build Web Applications and APIs without stress.
+H.php is a minimal PHP framework that is designed for you to quickly prototype and build idiomatic Web applications and APIs.
 
 <a id="install"></a>
 ### Installation
-Download latest release zip archive [here](https://github.com/devHammed/H.php/releases/latest) then extract and copy `.htaccess` file to your project root and `H.php` file in your project then you will require the file. If you are running PHP Built-in server you don't need the `.htaccess`, H.php will take care of the route handling when you start the server with the command `php -S localhost:PORT index.php` this would ensure that `index.php` handles all the Requests, you can also add `-t` option to set custom Document root. For Nginx users, check `nginx` file and add the contents to your server configurations.
+H.php can be installed using `Composer` using using below command:
+
+```bash
+  composer create-project devhammed/h-php
+```
 
 <a id="tests"></a>
 ### Tests
