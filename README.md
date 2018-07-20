@@ -294,21 +294,26 @@ This method returns FILES parameter value for `$key`.
 This method returns Request method if `$key` is NULL else compare `$key` to current Request method and returns TRUE or FALSE.
 It is possible to fake or override the HTTP request method. This is useful if, for example, you need to mimic a PUT request using a traditional web browser that only supports GET or POST requests.
 There are two ways to override the HTTP request method.
-1. You can include a `_METHOD` parameter in a POST request’s body. The HTTP request must use the `application/x-www-form-urlencoded` Content type.
-2. You can also override the HTTP request method with a custom X-Http-Method-Override HTTP request header. This works with any HTTP request content type.
+1. You can include a `_method` parameter in a POST request’s body. The HTTP request must use the `application/x-www-form-urlencoded` Content type.
+2. You can also override the HTTP request method with a custom `X-Http-Method-Override` HTTP request header. This works with any HTTP request content type.
 
 - @param (string) `$key` FILES parameter key
 - @returns (string | bool)
 
-### headers( $key=NULL )
-This method returns the Client Header value for `$key` if it is not NULL else if `$key` it returns the Headers array else if `$key` is not in Headers, it returns NULL.
+### header( $key )
+This method returns Client Header value for `$key` else returns NULL
 - @param (string) `$key` Header key e.g `X-API-Key`.
-- @returns (string | array | null)
+- @returns (string | null)
 
-### server( $key=NULL, $def=NULL )
-This method returns SERVER variable value for `$key` if it is not null else if `$key` is null it returns SERVER array else if `$key` is not in SERVER, it returns NULL.
-- @param (string) `$key` Header key e.g `SCRIPT_NAME`.
-- @returns (string | array | null)
+### hasHeader( $key )
+Returns TRUE if `$key` exists in the Headers array else FALSE
+- @param (string) `$key` Header key
+- @returns (bool)
+
+### env( $key, $def=NULL )
+This method returns SERVER value for `$key` else returns NULL
+- @param (string) `$key` SERVER key e.g `SCRIPT_NAME`.
+- @returns (string | null)
 
 ### base( $str=NULL )
 This method returns the base path for the projects, if `$str` is not null it get appended to the base path.
@@ -319,226 +324,6 @@ This method returns the base path for the projects, if `$str` is not null it get
 This method returns the full path for the projects, if `$str` is not null it get appended to the base path.
 - @param (string) `$str` Path to append to the full path
 - @returns (string)
-
-<a id="configuration"></a>
-### Configuration
-H.php comes with Configuration helper functions that can be used to set in-memory/runtime configurations.
-
-```php
-    config_set( $key, $value );
-```
-> This function can be used for setting configurations and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. NOTE: to use features like Database, Including View files, you should set below configurations:
-
-* `views_dir` : the directory to load views from. default: `views/`.
-* `views_extension`: View files extension e.g . default: `.php`
-* `db_host` : your database host. default: `localhost`.
-* `db_name` : your database name. default: `none`.
-* `db_user` : your database username. default: `root`.
-* `db_pass` : your database password. default: `none`.
-
-```php
-    config_get( $key, $default=NULL );
-```
-> This function can be used to get a configuration value and the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. returns `$default` if `$key` have not been set.
-
-```php
-    config_has( $key );
-```
-> This function can be used to check if a configuration have been set the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`. returns `TRUE` or `FALSE` based on the result of the checking.
-
-```php
-    config_delete( $key );
-```
-> This function deletes a configuration value if it have been set only the `$key` is case-insensitive e.g `DB_NAME` is same as `db_name`.
-
-```php
-    config_reset();
-```
-> This function resets the configuration array.
-
-<a id="routes"></a>
-### Routes
-H.php utilize simple and secured mechanism for it routing function `route()`. Below is the documentation for this function :-
-
-```php
-  route( $verb, $path, $callable_func );
-```
-> $verb ( string ): The HTTP method for the route, you can use `ANY` to match any HTTP method and you can separate methods by `|` to handle multiple methods e.g `GET | POST`. NOTE: it is case-insensitive that is, `GET` is same as `get` or `Get` or `gEt`.
-
-> $path ( string  | regexp ): The URL path to match against, to match dynamic routes prefix parameter's name with `@` e.g `/user/@name` and optional route path or parameters should be wrap in parentheses  e.g `/user(/@name)` and `/profile(/edit)`, you should always check if the optional part is provided before using it else you get `INDEX` error. All the dynamic parameters will be passed as a single Associative and Indexed Array to the handler function. You can add your own custom Regular Expressions for a Dynamic parameter by separating parameter name and Regular Expressions with `:` e.g `/user/@id:[0-9]+` or adding the Regex itself e.g `/user/[0-9]+` and remember you can only access it through it Index e.g `$args[0]`.
-
-> $callable_func ( callable ): It can be a anonymous function, variable function, array object or any other valid callable in PHP, you can read docs for PHP [call_user_func()](http://php.net/manual/en/function.call-user-func-array.php) to understand this better.
-
-Example:
-
-```php
-  # index.php
-  include 'myControllers/BooksController.php';
-
-  # Index Route that handle any method
-
-  route( 'ANY', '/', function(){
-    return 'Hello World'; # you can also use `echo`
-  } );
-
-  # Multiple method and Dynamic parameter
-
-  route( 'GET | POST', '/echo/@text', function( $args ){
-    config_set( 'page_title', 'Echo World' );
-    return config_get( 'page_title' ) . ' ' . $args['text']; # a view can be used instead!
-  } );
-
-  # Optional parameter
-
-  route( 'GET', '/optional(/@optional_arg)', function( $args ) {
-    if ( !isset( $args['optional_arg'] ) ) {
-      return 'Optional: not provided!';
-    }
-    return 'Optional: provided';
-  } );
-
-  # Optional Parameter that includes a required parameter
-
-  route( 'GET', '/optional(/@opt_arg_with_path)/edit', function( $args ) {
-    if ( !isset( $args['optional_arg_with_path'] ) ) {
-      return 'Optional: not provided!';
-    }
-    return 'Optional: provided';
-  } );
-
-  # Optional Named Dynamic parameter with custom regex
-
-  route( 'GET', '/optional(/@optional_arg_regex:[0-9]+)', function( $args ) {
-    if ( !isset( $args['optional_arg_regex'] ) ) {
-      return 'Optional: not provided!';
-    }
-    return 'Optional: provided';
-  } );
-
-  # Named Dynamic parameter with custom regex
-
-  route( 'GET', '/@my_regex:[0-9]+', function( $args ) {
-    return $args['my_regex'];
-  } );
-
-  # Indexed Dynamic parameter with custom regex
-
-  route( 'GET', '/user/[0-9]+', function( $args ) {
-    return $args[0];
-  } );
-
-  # Route using Class method
-
-  route( 'GET', '/books', array( new BooksController(), 'index' ) );
-
-  # myControllers/BooksController.php
-
-  class BooksController {
-    public function index() {
-      # do some magic here!
-    }
-  }
-```
-
-Another interesting H.php function is the `route_base()` that allows you to group routes with the same base path together.
-
-```php
-  route_base( $base, $routes=array() )
-```
-> This function can be used to group routes or endpoints together. parameters explanations:-
-
-> `$base` The routes group endpoint e.g `/api/v1`
-> `$routes` Arrays of of each sub-routes in `Key-Value` pairs, the `Key` will look like something like `METHOD -> /my_path`. Notice: it is almost same as the `route( $method, $regex_path, $callable_handler );`, just that you will separate `$method` and `$regex_path` with `->` in the same string and the `Value` will be the `$callable_handler`.
-
->You can do anything possible with `route()`
-Below is an example / use-case when you need want to update API version without bringing down the first version.
-
-```php
-  # index.php
-
-  # Greeter v1 routes
-  route_base( '/api/v1', array(
-    'GET -> /greet/@name' => function( $args ) {
-      return 'Hello ' . $args['name'] . ' from the Old Greeter API';
-    }
-  ) );
-
-  # Greeter v2 routes, Added support for POST and PUT and also a new greetings message
-  route_base( '/api/v2', array(
-    'GET|POST|PUT -> /greet/@name' => function( $args ) {
-      return 'Greetings ' . $args['name'] . ', from the New Greeter API';
-    }
-  ) );
-```
-
-<a id="request"></a>
-### Request
-H.php comes with functions that you can use to interact with Client Request Headers and Variables.
-
-```php
-  req_get( $key, $def=NULL );
-```
-> The function will return the value for $key in $_GET array else it will return $def.
-
-```php
-  req_post( $key, $def=NULL );
-```
-> The function will return the value for $key in $_POST array else it will return $def.
-
-```php
-  req_put( $key, $def=NULL );
-```
-> The function will return the value for $key in PUT request array else it will return $def.
-
-```php
-  req_patch( $key, $def=NULL );
-```
-> The function will return the value for $key in PATCH request array else it will return $def.
-
-```php
-  req_raw( $key=NULL, $def=NULL );
-```
-
-> The function will return the value for $key in raw request body else return $def, if none is defined then the function returns unparsed request body.
-
-```php
-  req_file( $key, $def=NULL );
-```
-> The function will return the value for $key in $_FILES array else it will return $def.
-
-```php
-  req_method( $compare );
-```
-
-> The function returns the Request Method and if $compare is passed it will compare it and returns true/false. NOTE: To emulate PUT/PATCH/DELETE in HTML forms, use a form with `method="POST"` and you will add a hidden input with name `_method` and the method as the value. You can also method override with `X-HTTP-METHOD-OVERRIDE` header.
-
-```php
-  req_env( $variable );
-```
-
-> This function returns the environment variable in $_SERVER array.
-
-```php
-    req_header( $key );
-```
-> This function can be used to get a Client Request Headers e.g `X-Requested-With`, `Content-Type`, `X-API-Key` etc.
-
-```php
-  req_base( $str='' );
-
-  # URL: localhost/my_app/about
-  # returns `/my_app`
-```
-
-> The function returns the base URL for the project, it is useful for including CSS or Other static files. if $str is defined, it will be appended to the base e.g `req_base( '/css/styles.css' )` it will returns `/my_app/css/styles.css` if the base directory is `/my_app`. if the project is not in a sub-directory, it will return empty string.
-
-```php
-  req_site( $str='' );
-
-  # URL: localhost/my_app/about | returns: http(s)://localhost
-  # URL: www.mylivewebsite.tld/about | returns: http(s)://www.mylivewebsite.com
-```
-> This function returns the current domain and protocol, it is useful when you want to get full website URL without hard-coding it. if `$str` is defined, it will be appended to the returned URL, by default `$str` is empty and it is recommended to use it with `req_base()` to get accurate full URL, especially in localhost where you have not setup Virtual host.
 
 
 <a id="response"></a>

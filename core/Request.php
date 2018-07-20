@@ -4,12 +4,20 @@ namespace H;
 
 class Request {
 
+  function __construct() {
+    $this->headers = $this->getHeaders();
+    $this->files = $_FILES;
+    $this->get = $_GET;
+    $this->post = $_POST;
+    $this->server = $_SERVER;
+  }
+
   function get( $key, $def=NULL ) {
-    return isset( $_GET[ $key ] ) ? $_GET[ $key ] : $def;
+    return isset( $this->get[ $key ] ) ? $this->get[ $key ] : $def;
   }
 
   function post( $key, $def=NULL ) {
-    return isset( $_POST[ $key ] ) ? $_POST[ $key ] : $def;
+    return isset( $this->post[ $key ] ) ? $this->post[ $key ] : $def;
   }
 
   function put( $key, $def=NULL ) {
@@ -30,20 +38,20 @@ class Request {
   }
 
   function files( $key ) {
-    return isset( $_FILES[ $key ] ) ? $_FILES[ $key ] : NULL;
+    return isset( $this->files[ $key ] ) ? $this->files[ $key ] : NULL;
   }
 
   function method( $key=NULL ) {
-    $verb = strtoupper( $_SERVER['REQUEST_METHOD'] );
-    if ( isset( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ) ) {
-      $verb = strtoupper( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] );
+    $verb = strtoupper( $this->env( 'REQUEST_METHOD' ) );
+    if ( $this->hasHeader( 'X-Http-Method-Override' ) ) {
+      $verb = strtoupper( $this->header( 'X-Http-Method-Override' ) );
     } else {
-      $verb = isset( $_POST['_method'] ) ? strtoupper( $_POST['_method'] ) : $verb;
+      $verb = isset( $this->post['_method'] ) ? strtoupper( $this->post['_method'] ) : $verb;
     }
     return is_null( $key ) ? $verb : (strtoupper( $key ) === $verb);
   }
 
-  function headers( $key=NULL ) {
+  function getHeaders() {
     $headers = array();
     foreach ( $_SERVER as $k => $v ) {
       if ( substr( $k, 0, 5 ) == 'HTTP_' ) {
@@ -54,29 +62,30 @@ class Request {
         $headers[ $k ] = $v;
       }
     }
-    if ( is_null( $key ) ) {
-      return $headers;
-    }
-    $key = strtoupper( $key );
-    return isset( $headers[ $key ] ) ? $headers[ $key ] : NULL;
+    return $headers;
   }
 
-  function server( $key=NULL, $def=NULL ) {
-    if ( is_null( $key ) ) {
-      return $_SERVER;
-    }
+  function hasHeader( $key ) {
+    return isset( $this->headers[ strtoupper( $key ) ] );
+  }
+
+  function header( $key ) {
+    return $this->hasHeader( $key ) ? $this->headers[ strtoupper( $key ) ] : NULL;
+  }
+
+  function env( $key, $def=NULL ) {
     $key = strtoupper( $key );
-    return isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : $def;
+    return isset( $this->server[ $key ] ) ? $this->server[ $key ] : $def;
   }
 
   function base( $str=NULL ) {
-    return str_replace( '\\', '', dirname( dirname( $this->server( 'SCRIPT_NAME' ) ) ) ) . $str;
+    return str_replace( '\\', '', dirname( dirname( $this->env( 'SCRIPT_NAME' ) ) ) ) . $str;
   }
 
   function site( $str=NULL ) {
-    $protocol = ! empty( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on'
+    $protocol = ! empty( $this->server[ 'HTTPS' ] ) && $this->server[ 'HTTPS' ] === 'on'
       ? 'https://' : 'http://';
-    $domainName = $_SERVER[ 'HTTP_HOST' ];
+    $domainName = $this->server[ 'HTTP_HOST' ];
     return $protocol . $domainName . $str;
   }
 

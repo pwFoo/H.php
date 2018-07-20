@@ -30,8 +30,7 @@ class App {
       $verb = explode( '|', $route[0] );
       $verb = array_map( 'trim', array_map( 'strtoupper', $verb ) );
       $script_name = isset( $_SERVER['SCRIPT_NAME'] ) ? $_SERVER['SCRIPT_NAME'] : 'index.php';
-      $request_uri = !empty( $_SERVER['REQUEST_URI'] ) ? $_SERVER[ 'REQUEST_URI' ] : '/';
-      $request_uri = str_replace( dirname( $script_name ), '', $request_uri );
+      $request_uri = str_replace( dirname( $script_name ), '', strtok( $_SERVER[ 'REQUEST_URI' ],'?' ) );
       $path = preg_replace_callback(
         '#@([\w]+)(:([^/()]*))?#',
         function( $matches ) {
