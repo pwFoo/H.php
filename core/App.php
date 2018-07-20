@@ -13,6 +13,7 @@ class App {
       'response' => new Response(),
       'cookie' => new Cookie(),
       'session' => new Session(),
+      'database' => __NAMESPACE__ .'\Database',
       'flash' => new Flash(),
       'hash' => new Hash(),
       'config' => new Config(),
@@ -54,6 +55,34 @@ class App {
     } else {
       die( 'Page not found!' );
     }
+  }
+
+  function get( $path, $func ) {
+    $this->map( 'GET', $path, $func );
+  }
+
+  function post( $path, $func ) {
+    $this->map( 'POST', $path, $func );
+  }
+
+  function put( $path, $func ) {
+    $this->map( 'PUT', $path, $func );
+  }
+
+  function patch( $path, $func ) {
+    $this->map( 'PATCH', $path, $func );
+  }
+
+  function delete( $path, $func ) {
+    $this->map( 'DELETE', $path, $func );
+  }
+
+  function options( $path, $func ) {
+    $this->map( 'OPTIONS', $path, $func );
+  }
+
+  function any( $path, $func ) {
+    $this->map( 'ANY', $path, $func );
   }
 
   function group( $base, $routes=array() ) {

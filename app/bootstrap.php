@@ -19,22 +19,22 @@ switch ( H_PHP_ENVIRONMENT ) {
 }
 
 
-$core_files = array_diff( scandir( H_PHP_DIR.'core' ), array( '..', '.' ) );
+$core_files = array_diff( scandir( H_PHP_CORE ), array( '..', '.' ) );
 foreach ( $core_files as $core_file ) {
-  require_once H_PHP_DIR . '/core/' . $core_file;
+  require_once H_PHP_CORE . DS . $core_file;
 }
 
-$controller_files = array_diff( scandir( H_PHP_DIR.H_PHP_CONTROLLERS ), array( '..', '.' ) );
+$controller_files = array_diff( scandir( H_PHP_DIR . H_PHP_CONTROLLERS ), array( '..', '.' ) );
 foreach ( $controller_files as $controller_file ) {
-  require_once H_PHP_DIR . H_PHP_CONTROLLERS. '/' . $controller_file;
+  require_once H_PHP_DIR . H_PHP_CONTROLLERS. DS . $controller_file;
 }
 
 $model_files = array_diff( scandir( H_PHP_DIR.H_PHP_MODELS ), array('..', '.') );
 foreach ( $model_files as $model_file ) {
-  require_once H_PHP_DIR . H_PHP_MODELS.'/'. $model_file;
+  require_once H_PHP_DIR . H_PHP_MODELS. DS . $model_file;
 }
 
-$composer = H_PHP_DIR . 'vendor/autoload.php';
+$composer = H_PHP_DIR . 'vendor' . DS . 'autoload.php';
 if ( file_exists( $composer ) ) {
   require_once $composer;
 }

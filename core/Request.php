@@ -22,7 +22,7 @@ class Request {
 
   function raw( $key=NULL, $def=NULL ) {
     $input = file_get_contents( 'php://input' );
-    if ( empty( $key ) ) {
+    if ( is_null( $key ) ) {
       return $input;
     }
     parse_str( $input, $rawBody );
@@ -33,17 +33,17 @@ class Request {
     return isset( $_FILES[ $key ] ) ? $_FILES[ $key ] : NULL;
   }
 
-  function method( $key='' ) {
+  function method( $key=NULL ) {
     $verb = strtoupper( $_SERVER['REQUEST_METHOD'] );
     if ( isset( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ) ) {
       $verb = strtoupper( $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] );
     } else {
       $verb = isset( $_POST['_method'] ) ? strtoupper( $_POST['_method'] ) : $verb;
     }
-    return empty( $key ) ? $verb : (strtoupper( $key ) === $verb);
+    return is_null( $key ) ? $verb : (strtoupper( $key ) === $verb);
   }
 
-  function header( $key ) {
+  function headers( $key=NULL ) {
     $headers = array();
     foreach ( $_SERVER as $k => $v ) {
       if ( substr( $k, 0, 5 ) == 'HTTP_' ) {
@@ -54,20 +54,26 @@ class Request {
         $headers[ $k ] = $v;
       }
     }
+    if ( is_null( $key ) ) {
+      return $headers;
+    }
     $key = strtoupper( $key );
     return isset( $headers[ $key ] ) ? $headers[ $key ] : NULL;
   }
 
-  function env( $key='' ) {
+  function server( $key=NULL, $def=NULL ) {
+    if ( is_null( $key ) ) {
+      return $_SERVER;
+    }
     $key = strtoupper( $key );
-    return isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : getenv( $key );
+    return isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : $def;
   }
 
-  function base( $str='' ) {
-    return str_replace( '\\', '', dirname( req_env( 'SCRIPT_NAME' ) ) ) . $str;
+  function base( $str=NULL ) {
+    return str_replace( '\\', '', dirname( dirname( $this->server( 'SCRIPT_NAME' ) ) ) ) . $str;
   }
 
-  function site( $str='' ) {
+  function site( $str=NULL ) {
     $protocol = ! empty( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on'
       ? 'https://' : 'http://';
     $domainName = $_SERVER[ 'HTTP_HOST' ];

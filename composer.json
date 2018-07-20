@@ -3,7 +3,6 @@
     "description": "H.php | The Minimalist PHP Framework!",
     "type": "project",
     "license": "MIT",
-    "version": "2.0",
     "keywords": [ "h.php", "h-php", "micro framework", "php" ],
     "authors": [
         {
