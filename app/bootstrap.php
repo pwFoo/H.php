@@ -59,7 +59,7 @@ foreach ($scan_controllers_dir as $scd) {
 $scan_models_dir = array_diff( scandir( H_PHP_DIR.H_PHP_MODELS ), array('..', '.') );
 foreach ( $scan_models_dir as $smd ) {
   try {
-    require_once H_PHP_DIR.H_PHP_MODELS.'/'.$smd;
+    require_once H_PHP_DIR . H_PHP_MODELS.'/'.$smd;
   } catch ( Exception $e ) {
     die( 'Failed to autoload models' );
   }
@@ -67,7 +67,7 @@ foreach ( $scan_models_dir as $smd ) {
 
 try {
   if ( $CONFIG[ 'load_composer' ] === TRUE ) {
-    require_once H_PHP_DIR . '/vendor/autoload.php';
+    require_once H_PHP_DIR . 'vendor/autoload.php';
   }
 } catch ( Exception $e ) {
   throw new Exception( 'Failed to load composer' );
