@@ -4,7 +4,7 @@ namespace H;
 
 use PDO;
 
-class Database {
+class DB {
 
   function run( $sql, $bind=array() ) {
     $dbuser = defined( 'DB_USER' ) ? DB_USER : null;
