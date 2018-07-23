@@ -30,7 +30,7 @@ H.php is a minimal PHP framework that is designed for you to quickly prototype a
 H.php can be installed using `Composer` using using below command:-
 
 ```bash
-  composer create-project --prefer-dist devhammed/h-php project_dir *
+  composer create-project --prefer-dist devhammed/h-php project_dir
 ```
 > Where `project_dir` is the directory you want H.php to be installed, if it does not exists Composer will create it.
 
