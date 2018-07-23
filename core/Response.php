@@ -4,7 +4,7 @@ namespace H;
 
 class Response {
 
-  function addHeader( $str, $code=NULL ) {
+  function addHeader( $str, $code=null ) {
     if ( ! headers_sent() ) {
       header( $str , true, $code );
     }
@@ -25,28 +25,6 @@ class Response {
 
   function type( $type ) {
     $this->addHeader( 'Content-type: ' . $type );
-  }
-
-  function render( $file='', $vars='' ) {
-    $file = H_PHP_VIEWS . '/' . $file;
-    if ( ! file_exists( $file ) ) {
-      die( 'View file not found: ' . $file );
-    }
-    if ( is_array( $vars ) ) {
-      extract( $vars );
-    }
-    ob_start();
-    include $file;
-    return ob_get_clean();
-  }
-
-  function renderStr( $tpl, $vars=NULL ) {
-    if ( is_array( $vars ) ) {
-      extract( $vars );
-    }
-    ob_start();
-    eval( '?>' . $tpl );
-    return ob_get_clean();
   }
 
   function json( $data ) {

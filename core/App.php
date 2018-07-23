@@ -7,18 +7,15 @@ class App {
   private $routes = array();
 
   function __construct() {
-    define( 'H_PHP', 1 );
-    $this->app = (object) array(
-      'request' => new Request(),
-      'response' => new Response(),
-      'cookie' => new Cookie(),
-      'session' => new Session(),
-      'database' => __NAMESPACE__ .'\Database',
-      'flash' => new Flash(),
-      'hash' => new Hash(),
-      'config' => new Config(),
+    $h_container = array(
       'args' => array()
     );
+    $modules = explode( ',', CORE_MODULES );
+    foreach ( $modules as $module ) {
+      $module_class = __NAMESPACE__ . '\\' . $module;
+      $h_container[ strtolower( $module ) ] = new $module_class();
+    }
+    $this->h = (object) $h_container;
   }
 
   function map( $verb, $path, $func ) {
@@ -41,16 +38,16 @@ class App {
         },
         str_replace( ')', ')?', '~^' . $path . '/?$~' )
       );
-      $verb_matched = in_array( 'ANY', $verb ) || in_array( $this->app->request->method(), $verb );
+      $verb_matched = in_array( 'ANY', $verb ) || in_array( $this->h->request->method(), $verb );
       if ( preg_match( $path, $request_uri, $args ) && $verb_matched ) {
         array_shift( $args );
-        $this->app->args = $args;
-        die( call_user_func( $route[1], $this->app ) );
+        $this->h->args = $args;
+        die( call_user_func( $route[1], $this->h ) );
       }
     }
-    $this->app->response->statusCode( 404 );
+    $this->h->response->statusCode( 404 );
     if ( isset( $this->routes['404'] ) ) {
-      die( call_user_func( $this->routes['404'][1], $this->app ) );
+      die( call_user_func( $this->routes['404'][1], $this->h ) );
     } else {
       die( 'Page not found!' );
     }

@@ -23,7 +23,7 @@ class Flash {
       session_start();
     }
     if ( ! $this->has( $key ) ) {
-      return NULL;
+      return null;
     }
     $val = $_SESSION[ 'h_php_flash_msg' ][ $key ];
     unset( $_SESSION[ 'h_php_flash_msg' ][ $key ] );
@@ -35,7 +35,7 @@ class Flash {
       session_start();
     }
     if ( ! $this->has( $key ) ) {
-      return NULL;
+      return null;
     }
     return $_SESSION[ 'h_php_flash_msg' ][ $key ];
   }

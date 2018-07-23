@@ -12,7 +12,7 @@ class Session {
     $_SESSION[ $key ] = $val;
   }
 
-  function get( $key, $def=NULL ) {
+  function get( $key, $def=null ) {
     return $this->has( $key ) ? $_SESSION[ $key ] : $def;
   }
 

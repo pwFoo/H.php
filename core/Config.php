@@ -10,7 +10,7 @@ class Config {
     $this->configs[ $key ] = $val;
   }
 
-  function get( $key, $def=NULL ) {
+  function get( $key, $def=null ) {
     return $this->has( $key ) ? $this->configs[ $key ] : $def;
   }
 

@@ -4,10 +4,10 @@
 require 'app/bootstrap.php';
 
 # create new application
-$app = new H\App();
+$app = new \H\App();
 
 # define routes
-$app->get( '/', function( $self ) {
+$app->get( '/', function( $h ) {
   return 'Hello World!';
 } );
 

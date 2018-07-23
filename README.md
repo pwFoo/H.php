@@ -10,6 +10,7 @@
 * [Routes](#routes)
 * [Request](#request)
 * [Response](#response)
+* [View](#view)
 * [Database](#database)
 * [Configuration](#configuration)
 * [Cookies](#cookie)
@@ -29,7 +30,7 @@ H.php is a minimal PHP framework that is designed for you to quickly prototype a
 H.php can be installed using `Composer` using using below command:-
 
 ```bash
-  composer create-project --prefer-dist devhammed/h-php project_dir "*"
+  composer create-project --prefer-dist devhammed/h-php project_dir *
 ```
 > Where `project_dir` is the directory you want H.php to be installed, if it does not exists Composer will create it.
 
@@ -42,14 +43,15 @@ Below is the Project Structure of H.php and their explanation in parentheses:
 ```
   -- project_dir
     -- app ( application directory )
-      -- Controllers (Controller files, optional)
-      -- Models (Model files, optional)
-      -- Views (View files, optional)
+      -- controllers (Controller files, optional)
+      -- models (Model files, optional)
+      -- views (View files, optional)
       bootstrap.php (Startup file, don't edit)
       config.php (Configuration constants, edit to suite your project)
     -- core (H.php framework files)
     -- vendor (Composer files if you are using it)
     index.php (Front controller)
+    server.php (For PHP Builtin server)
     .htaccess
     nginx
 ```
@@ -64,10 +66,10 @@ After getting familiar with H.php project structure, if you check `index.php` fi
   require 'app/bootstrap.php';
 
   # create new application
-  $app = new H\App();
+  $app = new \H\App();
 
   # define routes
-  $app->get( '/', function( $self ) {
+  $app->get( '/', function( $h ) {
     return 'Hello World!';
   } );
 
@@ -77,9 +79,9 @@ After getting familiar with H.php project structure, if you check `index.php` fi
 That is just the basic example to create H.php projects, run below command to start PHP Built-in server in the project directory.
 
 ```bash
-  php -S localhost:8080 index.php
+  php -S localhost:8080 server.php
 ```
-Now visit [localhost:8080](localhost:8080) to see the app running, you can use any Web Server but this is just to show that it can work even with the simplest Server implementations. You will learn more about routing and the `$self` parameter in the callback function in the next section.
+Now visit [localhost:8080](localhost:8080) to see the app running, `server.php` is a PHP script that mimics URL Rewrite functionality like Apache `.htaccess` or Nginx Server Configurations for the PHP Builtin Server. you can use any Web Server but this is just to show that it can work even with the simplest Server implementations. You will learn more about routing and the `$h` parameter in the callback function in the next section.
 
 <a id="routes"></a>
 ## Routes
@@ -90,9 +92,9 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->get( '/users/@id', function( $self ) {
-    # User with $self->args['id']
+  $app = new \H\App();
+  $app->get( '/users/@id', function( $h ) {
+    # User with $h->args['id']
   } );
 ```
 
@@ -101,8 +103,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->post( '/users', function( $self ) {
+  $app = new \H\App();
+  $app->post( '/users', function( $h ) {
     # Create new User
   } );
 ```
@@ -112,9 +114,9 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->put( '/users/@id', function( $self ) {
-    # Update User with $self->args['id']
+  $app = new \H\App();
+  $app->put( '/users/@id', function( $h ) {
+    # Update User with $h->args['id']
   } );
 ```
 
@@ -123,9 +125,9 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->delete( '/users/@id', function( $self ) {
-    # Delete User with $self->args['id']
+  $app = new \H\App();
+  $app->delete( '/users/@id', function( $h ) {
+    # Delete User with $h->args['id']
   } );
 ```
 
@@ -134,9 +136,9 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->patch( '/users/@id', function( $self ) {
-    # Patch User info with $self->args['id']
+  $app = new \H\App();
+  $app->patch( '/users/@id', function( $h ) {
+    # Patch User info with $h->args['id']
   } );
 ```
 
@@ -145,8 +147,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->options( '/users', function( $self ) {
+  $app = new \H\App();
+  $app->options( '/users', function( $h ) {
     # Show currrent route information
   } );
 ```
@@ -156,21 +158,21 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->any( '/users/@id', function( $self ) {
-    # Detect Request Method with $self->request->method()
-    # Delete User with $self->args['id']
+  $app = new \H\App();
+  $app->any( '/users/@id', function( $h ) {
+    # Detect Request Method with $h->request->method()
+    # Delete User with $h->args['id']
   } );
 ```
 
 ### Multiple methods
 > You can add a route that handles multiple HTTP requests with the H.php instance map() method. It accepts 3 arguments:
-- (string) The route method(s), separated by `|`
+- (string) The route HTTP method(s), separated by `|`.
 - (string) The route pattern
 - (callable) The route callback
 ```php
-  $app = new H\App();
-  $app->map( 'GET | HEAD', '/users', function( $self ) {
+  $app = new \H\App();
+  $app->map( 'GET | HEAD', '/users', function( $h ) {
     # Do some magic!
   } );
 ```
@@ -180,13 +182,13 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 - (string) The route pattern
 - (array) The child routes, Array item key should contain method and path separated by `->` and Value should be the callback handler.
 ```php
-  $app = new H\App();
+  $app = new \H\App();
   $app->group( '/users', array(
-    'GET' => function( $self ) {
+    'GET' => function( $h ) {
       # base route handler
     },
-    'GET -> /@id' => function( $self ) {
-      # Get User `$self->args['id]` details
+    'GET -> /@id' => function( $h ) {
+      # Get User `$h->args['id]` details
     },
   ) );
 ```
@@ -196,34 +198,34 @@ Each routing method described above accepts a URL pattern that is matched agains
 #### How To
 A route named parameter should be prefixed with `@` e.g
 ```php
-  $app = new H\App();
-  $app->get( '/user/@id', function( $self ) {
-    return $self->args['id'] . ' profile';
+  $app = new \H\App();
+  $app->get( '/user/@id', function( $h ) {
+    return $h->args['id'] . ' profile';
   } );
 ```
 #### Optional Named parameter
 A optional named parameter should be wrapped in parentheses, it also support nesting e.g
 ```php
-  $app = new H\App();
-  $app->get( '/users(/@id)', function( $self ) {
+  $app = new \H\App();
+  $app->get( '/users(/@id)', function( $h ) {
     # handles /users, /user/ and /users/1
   } );
 
-  $app->get( '/archives(/@year(/@month))', function ( $self ) {
+  $app->get( '/archives(/@year(/@month))', function ( $h ) {
     # handles `/archives`, `/archives/2016` and `/archives/2016/03`
   } );
 ```
 #### Custom Regular Expressions
 H.php route named parameters accept any value by default but you can specify your own custom Regular Expressions for parameters, you just have to separate the named parameter and Regex with `:` e.g
 ```php
-  $app = new H\App();
-  $app->get( '/users/@id:[0-9]+', function( $self ) {
-    # Get User `$self->args['id']` details
+  $app = new \H\App();
+  $app->get( '/users/@id:[0-9]+', function( $h ) {
+    # Get User `$h->args['id']` details
   } );
 ```
 
-### $self Parameter
-> You will notice that a parameter `$self` is been passed to route callback functions. This Object contains the following:
+### $h Parameter
+> You will notice that a parameter `$h` is been passed to route callback functions. This Object contains the following:
 - (object) `response`
 - (object) `request`
 - (object) `database`
@@ -232,24 +234,25 @@ H.php route named parameters accept any value by default but you can specify you
 - (object) `config`
 - (object) `flash`
 - (object) `hash`
+- (object) `view`
 - (array) `args` (route parameters)
 
-You can also access this Object through `app` property of H.php instance e.g `$app->app`.
+You can also access this Object through `h` property of H.php instance e.g `$app->h`.
 
 ### 404 handler
 > You can add a route that handles 404 HTTP requests with the H.php instance notFound() method, if you didn't add the handler the default message will be `404 Error - Page not found!`. It accepts 1 arguments:
 - (callable) The 404 callback
 ```php
-  $app = new H\App();
-  $app->get( '/', function( $self ) {
+  $app = new \H\App();
+  $app->get( '/', function( $h ) {
     return 'Hello World';
   } );
-  $app->notFound( function( $self ) {
+  $app->notFound( function( $h ) {
     return '404';
   } );
 ```
 
-Congratulations for making it this far, we are now going to walk through the Objects in `$self` parameters and their methods!
+Congratulations for making it this far, we are now going to walk through the Objects in `$h` parameters and their methods!
 
 <a id="request"></a>
 ## Request
@@ -297,7 +300,7 @@ There are two ways to override the HTTP request method.
 1. You can include a `_method` parameter in a POST request’s body. The HTTP request must use the `application/x-www-form-urlencoded` Content type.
 2. You can also override the HTTP request method with a custom `X-Http-Method-Override` HTTP request header. This works with any HTTP request content type.
 
-- @param (string) `$key` FILES parameter key
+- @param (string) `$key` The HTTP method to compare against the current method
 - @returns (string | bool)
 
 ### header( $key )

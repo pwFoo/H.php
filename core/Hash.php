@@ -4,7 +4,7 @@ namespace H;
 
 class Hash {
 
-  function make( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+  function make( $str, $algo=PASSWORD_DEFAULT, $opts=null ) {
     return password_hash( $str, $algo, $opts );
   }
 
@@ -12,7 +12,7 @@ class Hash {
     return password_verify( $str, $hash );
   }
 
-  function needsRehash( $str, $algo=PASSWORD_DEFAULT, $opts=NULL ) {
+  function needsRehash( $str, $algo=PASSWORD_DEFAULT, $opts=null ) {
     return password_needs_rehash( $str, $algo, $opts );
   }
 

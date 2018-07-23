@@ -12,23 +12,23 @@ class Request {
     $this->server = $_SERVER;
   }
 
-  function get( $key, $def=NULL ) {
+  function get( $key, $def=null ) {
     return isset( $this->get[ $key ] ) ? $this->get[ $key ] : $def;
   }
 
-  function post( $key, $def=NULL ) {
+  function post( $key, $def=null ) {
     return isset( $this->post[ $key ] ) ? $this->post[ $key ] : $def;
   }
 
-  function put( $key, $def=NULL ) {
+  function put( $key, $def=null ) {
     return $this->method( 'PUT' ) ? $this->raw( $key ) : $def;
   }
 
-  function patch( $key, $def=NULL ) {
+  function patch( $key, $def=null ) {
     return $this->method( 'PATCH' ) ? $this->raw( $key ) : $def;
   }
 
-  function raw( $key=NULL, $def=NULL ) {
+  function raw( $key=null, $def=null ) {
     $input = file_get_contents( 'php://input' );
     if ( is_null( $key ) ) {
       return $input;
@@ -38,10 +38,10 @@ class Request {
   }
 
   function files( $key ) {
-    return isset( $this->files[ $key ] ) ? $this->files[ $key ] : NULL;
+    return isset( $this->files[ $key ] ) ? $this->files[ $key ] : null;
   }
 
-  function method( $key=NULL ) {
+  function method( $key=null ) {
     $verb = strtoupper( $this->env( 'REQUEST_METHOD' ) );
     if ( $this->hasHeader( 'X-Http-Method-Override' ) ) {
       $verb = strtoupper( $this->header( 'X-Http-Method-Override' ) );
@@ -70,19 +70,19 @@ class Request {
   }
 
   function header( $key ) {
-    return $this->hasHeader( $key ) ? $this->headers[ strtoupper( $key ) ] : NULL;
+    return $this->hasHeader( $key ) ? $this->headers[ strtoupper( $key ) ] : null;
   }
 
-  function env( $key, $def=NULL ) {
+  function env( $key, $def=null ) {
     $key = strtoupper( $key );
     return isset( $this->server[ $key ] ) ? $this->server[ $key ] : $def;
   }
 
-  function base( $str=NULL ) {
-    return str_replace( '\\', '', dirname( dirname( $this->env( 'SCRIPT_NAME' ) ) ) ) . $str;
+  function base( $str=null ) {
+    return str_replace( '\\', '', dirname( dirname( 'Request.php' ) ) ) . $str;
   }
 
-  function site( $str=NULL ) {
+  function site( $str=null ) {
     $protocol = ! empty( $this->server[ 'HTTPS' ] ) && $this->server[ 'HTTPS' ] === 'on'
       ? 'https://' : 'http://';
     $domainName = $this->server[ 'HTTP_HOST' ];
