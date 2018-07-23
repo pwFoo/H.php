@@ -76,11 +76,13 @@ After getting familiar with H.php project structure, if you check `index.php` fi
   # run the application
   $app->run();
 ```
+
 That is just the basic example to create H.php projects, run below command to start PHP Built-in server in the project directory.
 
 ```bash
   php -S localhost:8080 server.php
 ```
+
 Now visit [localhost:8080](localhost:8080) to see the app running, `server.php` is a PHP script that mimics URL Rewrite functionality like Apache `.htaccess` or Nginx Server Configurations for the PHP Builtin Server. you can use any Web Server but this is just to show that it can work even with the simplest Server implementations. You will learn more about routing and the `$h` parameter in the callback function in the next section.
 
 <a id="routes"></a>
@@ -92,6 +94,7 @@ You can add a route that handles GET HTTP requests with the H.php instance get()
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->get( '/users/@id', function( $h ) {
@@ -104,6 +107,7 @@ You can add a route that handles POST HTTP requests with the H.php instance post
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->post( '/users', function( $h ) {
@@ -116,6 +120,7 @@ You can add a route that handles PUT HTTP requests with the H.php instance put()
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->put( '/users/@id', function( $h ) {
@@ -128,6 +133,7 @@ You can add a route that handles DELETE HTTP requests with the H.php instance de
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->delete( '/users/@id', function( $h ) {
@@ -140,6 +146,7 @@ You can add a route that handles PATCH HTTP requests with the H.php instance del
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->patch( '/users/@id', function( $h ) {
@@ -152,6 +159,7 @@ You can add a route that handles OPTIONS HTTP requests with the H.php instance o
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->options( '/users', function( $h ) {
@@ -164,6 +172,7 @@ You can add a route that handles any HTTP requests with the H.php instance any()
 
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->any( '/users/@id', function( $h ) {
@@ -178,6 +187,7 @@ You can add a route that handles multiple HTTP requests with the H.php instance 
 - (string) The route HTTP method(s), separated by `|`.
 - (string) The route pattern
 - (callable) The route callback
+
 ```php
   $app = new \H\App();
   $app->map( 'GET | HEAD', '/users', function( $h ) {
@@ -190,6 +200,7 @@ You can add group routes with the same base path together using H.php instance g
 
 - (string) The route pattern
 - (array) The child routes, Array item key should contain method and path separated by `->` and Value should be the callback handler.
+
 ```php
   $app = new \H\App();
   $app->group( '/users', array(
@@ -207,6 +218,7 @@ Each routing method described above accepts a URL pattern that is matched agains
 
 #### How To
 A route named parameter should be prefixed with `@` e.g
+
 ```php
   $app = new \H\App();
   $app->get( '/user/@id', function( $h ) {
@@ -215,6 +227,7 @@ A route named parameter should be prefixed with `@` e.g
 ```
 #### Optional Named parameter
 A optional named parameter should be wrapped in parentheses, it also support nesting e.g
+
 ```php
   $app = new \H\App();
   $app->get( '/users(/@id)', function( $h ) {
@@ -227,6 +240,7 @@ A optional named parameter should be wrapped in parentheses, it also support nes
 ```
 #### Custom Regular Expressions
 H.php route named parameters accept any value by default but you can specify your own custom Regular Expressions for parameters, you just have to separate the named parameter and Regex with `:` e.g
+
 ```php
   $app = new \H\App();
   $app->get( '/users/@id:[0-9]+', function( $h ) {
@@ -235,7 +249,8 @@ H.php route named parameters accept any value by default but you can specify you
 ```
 
 ### $h Parameter
-> You will notice that a parameter `$h` is been passed to route callback functions, this object includes all the core objects in H.php that can be used to create a powerful APIs and Web applications. it contains the following methods / properties:
+You will notice that a parameter `$h` is been passed to route callback functions, this object includes all the core objects in H.php that can be used to create a powerful APIs and Web applications. it contains the following methods / properties:
+
 - (object) `response`
 - (object) `request`
 - (object) `db`
@@ -250,8 +265,10 @@ H.php route named parameters accept any value by default but you can specify you
 You can also access this Object through `h` property of H.php instance e.g `$app->h`.
 
 ### 404 handler
-> You can add a route that handles 404 HTTP requests with the H.php instance notFound() method, if you didn't add the handler the default message will be `404 Error - Page not found!`. It accepts 1 arguments:
+You can add a route that handles 404 HTTP requests with the H.php instance notFound() method, if you didn't add the handler the default message will be `404 Error - Page not found!`. It accepts 1 arguments:
+
 - (callable) The 404 callback
+
 ```php
   $app = new \H\App();
   $app->get( '/', function( $h ) {
@@ -270,36 +287,42 @@ H.php comes with a minimal Request Object that does just enough, lets walk throu
 
 ### get( $key, $def=NULL )
 This method returns GET Request parameter value for `$key`.
+
 - @param (string) `$key` GET parameter key
 - @param (mixed) `$def` A default value.
 - @returns (mixed) returns `$key` if isset else returns `$def`.
 
 ### post( $key, $def=NULL )
 This method returns POST Request parameter value for `$key`.
+
 - @param (string) `$key` POST parameter key
 - @param (mixed) `$def` A default value.
 - @returns (mixed) returns `$key` if isset else returns `$def`.
 
 ### put( $key, $def=NULL )
 This method returns PUT Request parameter value for `$key`.
+
 - @param (string) `$key` PUT parameter key
 - @param (mixed) `$def` A default value.
 - @returns (mixed) returns `$key` if isset else returns `$def`.
 
 ### patch( $key, $def=NULL )
 This method returns PATCH Request parameter value for `$key`.
+
 - @param (string) `$key` PATCH parameter key
 - @param (mixed) `$def` A default value.
 - @returns (mixed) returns `$key` if isset else returns `$def`.
 
 ### raw( $key=NULL, $def=NULL )
 This method returns raw Request body and parse it if `$key` is not null else returns the raw body.
+
 - @param (string) `$key` raw parameter key
 - @param (mixed) `$def` A default value.
 - @returns (mixed) returns raw Body if `$key` is NULL else if `$key` is not in parsed Body it returns `$def` else returns `$key` value in parsed Body.
 
 ### files( $key )
 This method returns FILES parameter value for `$key`.
+
 - @param (string) `$key` FILES parameter key
 - @returns (mixed) returns `$key` if isset else returns NULL.
 
@@ -307,6 +330,7 @@ This method returns FILES parameter value for `$key`.
 This method returns Request method if `$key` is NULL else compare `$key` to current Request method and returns TRUE or FALSE.
 It is possible to fake or override the HTTP request method. This is useful if, for example, you need to mimic a PUT request using a traditional web browser that only supports GET or POST requests.
 There are two ways to override the HTTP request method.
+
 1. You can include a `_method` parameter in a POST request’s body. The HTTP request must use the `application/x-www-form-urlencoded` Content type.
 2. You can also override the HTTP request method with a custom `X-Http-Method-Override` HTTP request header. This works with any HTTP request content type.
 
@@ -315,26 +339,31 @@ There are two ways to override the HTTP request method.
 
 ### header( $key )
 This method returns Client Header value for `$key` else returns NULL
+
 - @param (string) `$key` Header key e.g `X-API-Key`.
 - @returns (string|null)
 
 ### hasHeader( $key )
 Returns TRUE if `$key` exists in the Headers array else FALSE
+
 - @param (string) `$key` Header key
 - @returns (bool)
 
 ### env( $key, $def=NULL )
 This method returns SERVER value for `$key` else returns NULL
+
 - @param (string) `$key` SERVER key e.g `SCRIPT_NAME`.
 - @returns (string|null)
 
 ### base( $str=NULL )
 This method returns the base path for the projects, if `$str` is not null it get appended to the base path.
+
 - @param (string) `$str` Path to append to the base
 - @returns (string)
 
 ### site( $str=NULL )
 This method returns the full path for the projects, if `$str` is not null it get appended to the base path.
+
 - @param (string) `$str` Path to append to the full path
 - @returns (string)
 
