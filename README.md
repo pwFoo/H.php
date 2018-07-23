@@ -88,7 +88,8 @@ Now visit [localhost:8080](localhost:8080) to see the app running, `server.php` 
 You can define routes using HTTP verbs shorthand methods on the H\App instance or use the multiple HTTP verbs method.
 
 ### GET method
-> You can add a route that handles GET HTTP requests with the H.php instance get() method. It accepts 2 arguments:
+You can add a route that handles GET HTTP requests with the H.php instance get() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -99,7 +100,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### POST method
-> You can add a route that handles POST HTTP requests with the H.php instance post() method. It accepts 2 arguments:
+You can add a route that handles POST HTTP requests with the H.php instance post() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -110,7 +112,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### PUT method
-> You can add a route that handles PUT HTTP requests with the H.php instance put() method. It accepts 2 arguments:
+You can add a route that handles PUT HTTP requests with the H.php instance put() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -121,7 +124,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### DELETE method
-> You can add a route that handles DELETE HTTP requests with the H.php instance delete() method. It accepts 2 arguments:
+You can add a route that handles DELETE HTTP requests with the H.php instance delete() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -132,7 +136,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### PATCH method
-> You can add a route that handles PATCH HTTP requests with the H.php instance delete() method. It accepts 2 arguments:
+You can add a route that handles PATCH HTTP requests with the H.php instance delete() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -143,7 +148,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### OPTIONS method
-> You can add a route that handles OPTIONS HTTP requests with the H.php instance options() method. It accepts 2 arguments:
+You can add a route that handles OPTIONS HTTP requests with the H.php instance options() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -154,7 +160,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### ANY method
-> You can add a route that handles any HTTP requests with the H.php instance any() method. It accepts 2 arguments:
+You can add a route that handles any HTTP requests with the H.php instance any() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (callable) The route callback
 ```php
@@ -166,7 +173,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### Multiple methods
-> You can add a route that handles multiple HTTP requests with the H.php instance map() method. It accepts 3 arguments:
+You can add a route that handles multiple HTTP requests with the H.php instance map() method. It accepts 3 arguments:
+
 - (string) The route HTTP method(s), separated by `|`.
 - (string) The route pattern
 - (callable) The route callback
@@ -178,7 +186,8 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 ```
 
 ### Group routes
-> You can add group routes with the same base path together using H.php instance group() method. It accepts 2 arguments:
+You can add group routes with the same base path together using H.php instance group() method. It accepts 2 arguments:
+
 - (string) The route pattern
 - (array) The child routes, Array item key should contain method and path separated by `->` and Value should be the callback handler.
 ```php
@@ -195,6 +204,7 @@ You can define routes using HTTP verbs shorthand methods on the H\App instance o
 
 ### Dynamic routes
 Each routing method described above accepts a URL pattern that is matched against the current HTTP request URI. The patterns can use named parameters to dynamically match HTTP request URI.
+
 #### How To
 A route named parameter should be prefixed with `@` e.g
 ```php
@@ -225,7 +235,7 @@ H.php route named parameters accept any value by default but you can specify you
 ```
 
 ### $h Parameter
-> You will notice that a parameter `$h` is been passed to route callback functions. This Object contains the following:
+> You will notice that a parameter `$h` is been passed to route callback functions, this object includes all the core objects in H.php that can be used to create a powerful APIs and Web applications. it contains the following methods / properties:
 - (object) `response`
 - (object) `request`
 - (object) `db`
@@ -234,7 +244,8 @@ H.php route named parameters accept any value by default but you can specify you
 - (object) `config`
 - (object) `flash`
 - (object) `hash`
-- (array) `args` (route parameters)
+- (array) `args` (Current Route parameters)
+- (string) `url` (Current Request URL)
 
 You can also access this Object through `h` property of H.php instance e.g `$app->h`.
 
@@ -305,7 +316,7 @@ There are two ways to override the HTTP request method.
 ### header( $key )
 This method returns Client Header value for `$key` else returns NULL
 - @param (string) `$key` Header key e.g `X-API-Key`.
-- @returns (string | null)
+- @returns (string|null)
 
 ### hasHeader( $key )
 Returns TRUE if `$key` exists in the Headers array else FALSE
@@ -315,7 +326,7 @@ Returns TRUE if `$key` exists in the Headers array else FALSE
 ### env( $key, $def=NULL )
 This method returns SERVER value for `$key` else returns NULL
 - @param (string) `$key` SERVER key e.g `SCRIPT_NAME`.
-- @returns (string | null)
+- @returns (string|null)
 
 ### base( $str=NULL )
 This method returns the base path for the projects, if `$str` is not null it get appended to the base path.

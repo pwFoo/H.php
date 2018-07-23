@@ -8,7 +8,8 @@ class App {
 
   function __construct() {
     $h_container = array(
-      'args' => array()
+      'args' => array(),
+      'url' => '/'
     );
     $modules = explode( ',', CORE_MODULES );
     foreach ( $modules as $module ) {
@@ -42,6 +43,7 @@ class App {
       if ( preg_match( $path, $request_uri, $args ) && $verb_matched ) {
         array_shift( $args );
         $this->h->args = $args;
+        $this->h->url = $request_uri;
         die( call_user_func( $route[1], $this->h ) );
       }
     }

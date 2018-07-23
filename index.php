@@ -8,6 +8,7 @@ $app = new \H\App();
 
 # define routes
 $app->get( '/', function( $h ) {
+  echo $h->url;
   return 'Hello World!';
 } );
 
