@@ -22,7 +22,7 @@ define( 'DB_PASS', null );
 
 define( 'DB_NAME', null );
 
-// uncomment below to set custom PDO DSN
+// Uncomment below to set custom PDO DSN
 // define( 'DB_DSN', '' );
 
-// Other Global configurations
+// Other Custom Global configurations

@@ -19,14 +19,14 @@ class DB {
     try {
       $dbh = new \PDO( $dsn, $dbuser, $dbpass, $options );
     } catch ( PDOException $e ) {
-      die( $e->getMessage() );
+      throw new Exception( $e->getMessage(), 1 );
     }
     try {
       $res = $dbh->prepare( $sql );
       $res->execute( $bind );
       return $res;
     } catch ( PDOException $e ) {
-      die( 'Error executing SQL query!' );
+      throw new Exception( 'Error performing query: ' . $e->getMessage(), 1 );
     }
   }
 
@@ -47,7 +47,7 @@ class DB {
     return $this->run( $sql, $bind );
   }
 
-  function update( $table, $bind, $where=null ) {
+  function update( $table, $bind=array(), $where=null ) {
     ksort( $bind );
     $fields = null;
     foreach ( $bind as $k => $v ) {

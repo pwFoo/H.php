@@ -11,7 +11,7 @@
 * [Request](#request)
 * [Response](#response)
 * [View](#view)
-* [Database](#database)
+* [Database (DB)](#database)
 * [Configuration](#configuration)
 * [Cookies](#cookie)
 * [Session](#session)
@@ -53,9 +53,9 @@ Below is the Project Structure of H.php and their explanation in parentheses:
     index.php (Front controller)
     server.php (For PHP Builtin server)
     .htaccess
-    nginx
+    nginx-server.conf
 ```
-NOTE: H.php will autoload all this files for you, you only need to include `app/bootstrap.php` file in your `index.php`. And for Nginx users, you don't need `.htaccess` but instead copy the contents of `nginx` file to your server configurations.
+NOTE: H.php will autoload all this files for you, you only need to include `app/bootstrap.php` file in your `index.php`. And for Nginx users, you don't need `.htaccess` but instead copy the contents of `nginx-server.conf` file to your server configurations.
 
 <a id="hello-world"></a>
 ## Hello World
@@ -98,7 +98,7 @@ You can add a route that handles GET HTTP requests with the H.php instance get()
 ```php
   $app = new \H\App();
   $app->get( '/users/@id', function( $h ) {
-    # User with $h->args['id']
+    # Display User $h->args['id'] details
   } );
 ```
 
@@ -111,7 +111,7 @@ You can add a route that handles POST HTTP requests with the H.php instance post
 ```php
   $app = new \H\App();
   $app->post( '/users', function( $h ) {
-    # Create new User
+    # Create new User, access POST data with $h->request->post() method
   } );
 ```
 
@@ -124,7 +124,7 @@ You can add a route that handles PUT HTTP requests with the H.php instance put()
 ```php
   $app = new \H\App();
   $app->put( '/users/@id', function( $h ) {
-    # Update User with $h->args['id']
+    # Update User $h->args['id'] details
   } );
 ```
 
@@ -137,7 +137,7 @@ You can add a route that handles DELETE HTTP requests with the H.php instance de
 ```php
   $app = new \H\App();
   $app->delete( '/users/@id', function( $h ) {
-    # Delete User with $h->args['id']
+    # Delete User $h->args['id']
   } );
 ```
 
@@ -150,7 +150,7 @@ You can add a route that handles PATCH HTTP requests with the H.php instance del
 ```php
   $app = new \H\App();
   $app->patch( '/users/@id', function( $h ) {
-    # Patch User info with $h->args['id']
+    # Patch User $h->args['id'] details
   } );
 ```
 
@@ -163,7 +163,7 @@ You can add a route that handles OPTIONS HTTP requests with the H.php instance o
 ```php
   $app = new \H\App();
   $app->options( '/users', function( $h ) {
-    # Show currrent route information
+    # Show currrent route options
   } );
 ```
 
@@ -177,7 +177,6 @@ You can add a route that handles any HTTP requests with the H.php instance any()
   $app = new \H\App();
   $app->any( '/users/@id', function( $h ) {
     # Detect Request Method with $h->request->method()
-    # Delete User with $h->args['id']
   } );
 ```
 
@@ -191,7 +190,7 @@ You can add a route that handles multiple HTTP requests with the H.php instance 
 ```php
   $app = new \H\App();
   $app->map( 'GET | HEAD', '/users', function( $h ) {
-    # Do some magic!
+    # Do some magic here!
   } );
 ```
 
@@ -204,7 +203,7 @@ You can add group routes with the same base path together using H.php instance g
 ```php
   $app = new \H\App();
   $app->group( '/users', array(
-    'GET' => function( $h ) {
+    'GET|OPTIONS' => function( $h ) {
       # base route handler
     },
     'GET -> /@id' => function( $h ) {
@@ -231,7 +230,7 @@ A optional named parameter should be wrapped in parentheses, it also support nes
 ```php
   $app = new \H\App();
   $app->get( '/users(/@id)', function( $h ) {
-    # handles /users, /user/ and /users/1
+    # handles /users, /users/ and /users/1
   } );
 
   $app->get( '/archives(/@year(/@month))', function ( $h ) {
@@ -248,17 +247,36 @@ H.php route named parameters accept any value by default but you can specify you
   } );
 ```
 
-### $h Parameter
-You will notice that a parameter `$h` is been passed to route callback functions, this object includes all the core objects in H.php that can be used to create a powerful APIs and Web applications. it contains the following methods / properties:
+### Callback handler
+Callback handlers must be of PHP callable type and below formats are acceptable according to the PHP standards documentation. for Classes static or instance methods, their signature should be like Closure functions and for stress-free experience you should add your classes in `app/controllers` directory so that they can be autoloaded into your app.
 
-- (object) `response`
-- (object) `request`
-- (object) `db`
-- (object) `session`
-- (object) `cookie`
-- (object) `config`
-- (object) `flash`
-- (object) `hash`
+```php
+  # Closure functions
+  $app->get( '/', function( $h ) {
+    # closure
+  } );
+
+  # Class static methods
+  $app->get( '/', array( 'Class', 'staticMethod' ) );
+
+  # Class instance methods
+  $obj = new MyClass();
+  $app->get( '/', array( $obj, 'method' ) );
+
+  # and other callable types...
+```
+
+### $h Parameter
+You will notice that a parameter `$h` is been passed to route callback handlers, this object includes all the core objects in H.php that can be used to create a powerful APIs and Web applications. it contains the following methods / properties:
+
+- (object) `response` (Response object)
+- (object) `request` (Request object)
+- (object) `db` (Database object)
+- (object) `session` (Session object)
+- (object) `cookie` (Cookie object)
+- (object) `config` (Configuration object)
+- (object) `flash` (Flash Messages object)
+- (object) `hash`(Hash object)
 - (array) `args` (Current Route parameters)
 - (string) `url` (Current Request URL)
 
@@ -283,7 +301,7 @@ Congratulations for making it this far, we are now going to walk through the Obj
 
 <a id="request"></a>
 ## Request
-H.php comes with a minimal Request Object that does just enough, lets walk through its methods.
+H.php comes with a minimal Request Object that does just enough, lets walk through its methods and properties.
 
 ### get( $key, $def=NULL )
 This method returns GET Request parameter value for `$key`.
@@ -367,7 +385,152 @@ This method returns the full path for the projects, if `$str` is not null it get
 - @param (string) `$str` Path to append to the full path
 - @returns (string)
 
-> Will add docs for other Objects soon.
+<a id="response"></a>
+## Response
+H.php comes with a minimal Response Object that does just enough, lets walk through its methods and properties.
+
+### addHeader( $str, $code=null )
+This method is can be used to send HTTP Headers to the Client.
+
+- @param (string) `$str` HTTP Header e.g `Location: /new-path`
+- @param (int) `$code` HTTP Response Code e.g `302`
+- @returns `null`
+
+### redirect( $url )
+This method can be used to Redirect the client, it uses `addHeader()` under the hood.
+
+- @param (string) `$url` The URL to redirect to.
+- @returns `null`
+
+### statusCode( $code )
+This method can be used to indicate the HTTP Response Code of the current Request e.g `401`
+
+- @param (int) `$code` The Response Code
+- @returns (bool)
+
+### back()
+This method can be used to Redirect the User back to the previous URL. it uses HTTP Referer Header if set else it reload the current page.
+
+### type( $type )
+This method can be used to set the Response Content Type Header e.g `application/json`.
+
+- @param (string) HTTP Response type
+- @returns null
+
+### json( $data )
+This method can be used to send Array as JSON data to the client. it also use `type()` method to set the Response Content type o you don't need to.
+
+- @param (array) `$data` The Array to send as JSON.
+- @returns (string) The JSON data.
+
+### jsonp( $data, $func='callback' )
+This method is a secured and simple function to send JSONP data.
+
+- @param (array) `$data` The Array to send as JSON
+- @param (string) `$func` The JSONP callback function Query string key, default: `callback`.
+- @returns (string) The JavaScript containing JSONP data and Function call.
+
+<a id="view"></a>
+## View
+H.php does not actually come with a View Class but you can take advantage of Output Buffering and Control Structure Alternative Syntax to create powerful template system, you are also free to plug in any Template System of your choice. Below is an example code making use of it.
+
+```php
+  require 'app/bootstrap.php';
+
+  $app = new \H\App();
+  $app->get( '/', function( $h ) {
+    ob_start();
+    # declare your variables here
+    include 'app/views/index.php';
+    return ob_get_clean();
+  } );
+  $app-run();
+```
+
+<a id="database"></a>
+## Database (DB)
+H.php comes with a PDO-based Database CRUD class. to use this class make sure to edit below constants in `app/config.php` file.
+
+- DB_NAME
+- DB_USER
+- DB_PASS
+- DB_HOST
+
+The DB class uses MySQL/MariaDB DSN for PDO by default but you can set your own custom DSN using `DB_DSN` constant to suit your Database, below are some DSN for popular Databases :-
+
+Now, i hope you have understand how H.php DB class works under the hood. Lets walk through the methods available in this Class.
+
+### run( $sql, $bind=array() )
+This method can be used to used to run Raw SQL queries and it is also the base methods for other methods in DB class.
+
+- @param (string) `$sql` The SQL Query
+- @param (array) `$bind` The Query Bindings (if used)
+- @returns (PDOStatement) The result Object for further operations
+
+### select( $sql, $bind=array() )
+This method is a wrapper around `run()` for the SELECT query.
+
+- @param (string) `$sql` The SQL SELECT query
+- @param (array) `$bind` the Query bindings (if used)
+- @returns (array) The result rows Associative Array
+
+### insert( $table, $bind=array() )
+This method is a wrapper around `run()` for the INSERT operation.
+
+- @param (string) `$table` The Table to insert data into
+- @param (array) `$bind` Key and Value data to insert
+- @returns (int) The last Insert ID.
+
+### update( $table, $bind=array(), $where=null )
+This method is a wrapper around `run()` for the UPDATE operation.
+
+- @param (string) `$table` The table to Update
+- @param (array) `$bind` Key and Value data to Update
+- @param (string) `$where` The Update operation WHERE clause
+- @returns (int) The last Insert ID
+
+### delete( $table, $where=null, $limit=null )
+This method is a wrapper around `run()` for the DELETE operation.
+
+- @param (string) `$table` The table to delete data from
+- @param (string) `$where` The Delete operation WHERE clause
+- @param (int) `$limit` How many rows to delete, defaults to Delete all.
+
+<a id="configuration"></a>
+## Configuration
+H.php also comes with Config object to handle your Configurations and Plugins in more eloquent way than using Global constants. lets walk through it methods.
+
+### set( $key, $val )
+Add new Configuration or Plugin.
+
+- @param (string) `$key` The Identifier for this Configuration or Plugin
+- @param (mixed) `$val` The value, it can be of any type.
+
+### get( $key, $def=null )
+Get the value of a Configuration or Plugin.
+
+- @param (string) `$key` The Identifier for the Configuration or Plugin
+- @param (mixed/null) `$def` The default value to return if Configuration have not been set, defaults to `null`.
+- @returns (mixed) The value for `$key` if it have been set else returns `$def`.
+
+### has( $key )
+This method can be used to check if a Configuration have been set, some of the other methods used this internally e.g get / remove.
+
+- @param (string) `$key` The Identifier for the Configuration or Plugin
+- @returns (bool) True / False depending on the status of `$key`.
+
+### remove( $key )
+Remove Configuration from Object if it has been set.
+
+- @param (string) `$key` The Identifier for the Configuration or Plugin
+
+### reset()
+Be very careful when using this method, it can be used to empty the Configurations array.
+
+<a id="cookies"></a>
+## Cookies
+
+> Coming soon...
 
 Thanks, did you want to contribute? fork this repository and send pull requests.
 

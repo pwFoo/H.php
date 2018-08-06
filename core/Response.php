@@ -19,7 +19,7 @@ class Response {
   }
 
   function back() {
-    $ref = isset( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : '';
+    $ref = isset( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : '#';
     $this->redirect( $ref );
   }
 
@@ -38,7 +38,7 @@ class Response {
     }
     $this->type( 'text/javascript' );
     $func = preg_replace( '/[^\[\]\w$.]/g', '', $_GET[ $func ] );
-    echo '/**/ typeof ' . $func . ' === "function" && ' . $func . '(' . json_encode( $data ) .');';
+    return '/**/ typeof ' . $func . ' === "function" && ' . $func . '(' . $this->json( $data ) .');';
   }
 
 }
